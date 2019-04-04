@@ -48,26 +48,26 @@ def can_place_ship(row, column, direction, size, field):
 
 def place_ship(row, column, direction, size, field):
     if direction == 1:
-        for y in range(row - 1, row + 2):
-            for x in range(column - 1, column + size + 1):
-                if y == row and (column - 1 < x and x < column + size):
-                    field[y][x] = size
+        for r in range(row - 1, row + 2):
+            for c in range(column - 1, column + size + 1):
+                if r == row and (column - 1 < c and c < column + size):
+                    field[r][c] = size
                 else:
-                    field[y][x] = 9
+                    field[r][c] = 9
     elif direction == 0:
-        for y in range(row - 1, row + size + 1):
-            for x in range(column - 1, column + 2):
-                if (row - 1 < y and y < row + size) and x == column:
-                    field[y][x] = size
+        for r in range(row - 1, row + size + 1):
+            for c in range(column - 1, column + 1 + 1):
+                if (row - 1 < r and r < row + size) and c == column:
+                    field[r][c] = size
                 else:
-                    field[y][x] = 9
+                    field[r][c] = 9
 
 while (size > 0):
     quantity = 5 - size
     while (quantity > 0):
         row = random.randint(1, 10);
         column = random.randint(1, 10)
-        # if field[row,column] != 0: continue
+        if field[row][column] != 0: continue
         direction = random.randint(0, 1)  # 0 - down, 1 - right
 
         if can_place_ship(row, column, direction, size, field):
