@@ -22,16 +22,34 @@ field = [
 
 
 def can_place_ship(row, column, direction, size, field):
-    if
-        if direction == 1:
-            for x in range(0, size - 1):
-                if field[row + x, column] != 0: return False
+    if row + size - 1 > 10 or column + size - 1 > 10: return False
+
+    if direction == 1:
+        for x in range(0, size - 1):
+            if field[row + x][column] != 0: return False
 
     if direction == 0:
         for x in range(0, size - 1):
-            if field[row, column + x] != 0: return False
+            if field[row][column + x] != 0: return False
 
     return True
+
+
+def place_ship(row, column, direction, size, field):
+    if direction == 1:
+        for y in range(row - 1, row + 1):
+            for x in range(column - 1, column + size):
+                if y == row and column < x < column + size:
+                    field[y][x] = size
+                else:
+                    field[y][x] = -1
+    elif direction == 0:
+        for y in range(row - 1, row + size):
+            for x in range(column - 1, column + 1):
+                if row < y < row + size and x == column:
+                    field[y][x] = size
+                else:
+                    field[y][x] = -1
 
 
 while (size > 0):
@@ -43,11 +61,13 @@ while (size > 0):
 
         direction = random.randint(0, 1)  # 0 - down, 1 - right
         if can_place_ship(row, column, direction, size, field):
-            #             placeship
+            # placeship
+            place_ship(row, column, direction, size, field)
             print("Ship was placed with size " + str(size))
             quantity = quantity - 1
         elif can_place_ship(row, column, 1 - direction, size, field):
             # placeship
+            place_ship(row, column, 1 - direction, size, field)
             print("Ship was placed with size " + str(size))
             quantity = quantity - 1
         else:
