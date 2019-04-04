@@ -1,6 +1,5 @@
 import random
 
-
 field = [
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -14,7 +13,7 @@ field = [
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
-]
+    ]
 
 def can_place_ship(row, column, direction, size, field):
     if direction == 1:
@@ -26,6 +25,7 @@ def can_place_ship(row, column, direction, size, field):
         for x in range(0, size):
             if field[row + x][column] != 0: return False
     return True
+
 
 def place_ship(row, column, direction, size, field):
     if direction == 1:
@@ -43,6 +43,7 @@ def place_ship(row, column, direction, size, field):
                 else:
                     field[r][c] = 9
 
+
 def arrange_ships():
     size = 4
     quantity = 1
@@ -52,7 +53,7 @@ def arrange_ships():
     while (size > 0):
         quantity = 5 - size
         while (quantity > 0):
-            row = random.randint(1, 10);
+            row = random.randint(1, 10)
             column = random.randint(1, 10)
             if field[row][column] != 0: continue
             direction = random.randint(0, 1)  # 0 - down, 1 - right

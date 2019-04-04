@@ -1,3 +1,7 @@
+import tkinter
+
+tkinter._test()
+
 def show_battlefield(field):
     for r in range(len(field)):
         for c in range(len(field[r])):
@@ -8,6 +12,7 @@ def show_battlefield(field):
             else:
                 field[r][c] = "x"
     show_array(field)
+
 
 def show_array(field):
     for r in field:
