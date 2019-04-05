@@ -75,4 +75,4 @@ def arrange_ships():
             else:
                 continue
         size = size - 1
-        return field
+    return field

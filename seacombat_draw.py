@@ -13,8 +13,8 @@ field2_left_x = 14 * 25
 field2_left_y = 50
 white_rectangle = "#FFFFFF"
 black_rectangle = '#000000'
-field = []
-field2 = []
+field = None
+field2 = None
 
 
 def create_grid(w, h):
@@ -65,6 +65,7 @@ def draw_field(coord_x, coord_y, field):
                                         width=3, outline=draw_color)
 
 def start(f1, f2):
+    global field,field2
     field = f1
     field2 = f2
     init_gui()
