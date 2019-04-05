@@ -47,28 +47,28 @@ def init_gui():
 
 def draw_field(coord_x, coord_y, field):
     canvas.create_rectangle(coord_x - 1, coord_y - 1,
-                                                coord_x + 1 + cell_side * 10,
-                                                coord_y + 1 + cell_side * 10,
-                                                width=3, outline=draw_color)
+                            coord_x + 1 + cell_side * 10,
+                            coord_y + 1 + cell_side * 10,
+                            width=3, outline=draw_color)
 
     letters = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ж', 'З', 'И', 'К']
     for ix in range(10):
         canvas.create_text(coord_x + cell_side * ix + cell_side / 2,
-                                            coord_y - cell_side / 2, text=letters[ix],
-                                            fill=draw_color)
+                           coord_y - cell_side / 2, text=letters[ix],
+                           fill=draw_color)
         canvas.create_text(coord_x - cell_side / 2,
-                                            coord_y + cell_side * ix + cell_side / 2,
-                                            text=ix + 1,
-                                            fill=draw_color)
+                           coord_y + cell_side * ix + cell_side / 2,
+                           text=ix + 1,
+                           fill=draw_color)
 
     for r in range(1, 11):
         for c in range(1, 11):
             if field[r][c] in [1, 2, 3, 4]:
                 canvas.create_rectangle(coord_x + cell_side * (r - 1),
-                                                            coord_y + cell_side * (c - 1),
-                                                            coord_x + cell_side * r,
-                                                            coord_y + cell_side * c,
-                                                            width=3, outline=draw_color)
+                                        coord_y + cell_side * (c - 1),
+                                        coord_x + cell_side * r,
+                                        coord_y + cell_side * c,
+                                        width=3, outline=draw_color)
 
 
 def start(f1, f2):
