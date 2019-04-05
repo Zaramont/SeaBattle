@@ -30,7 +30,7 @@ def place_ship(row, column, direction, size, field):
                     field[r][c] = 9
 
 
-def arrange_ships():
+def get_arranged_ships():
     size = 4
     quantity = 1
     row = 0
