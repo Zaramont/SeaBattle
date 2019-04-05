@@ -61,13 +61,11 @@ def get_arranged_ships():
             direction = random.randint(0, 1)  # 0 - down, 1 - right
 
             if can_place_ship(row, column, direction, size, field):
-                # placeship
                 place_ship(row, column, direction, size, field)
                 # print("Ship with size " + str(size))
                 # show_array()
                 quantity = quantity - 1
             elif can_place_ship(row, column, 1 - direction, size, field):
-                # placeship
                 place_ship(row, column, 1 - direction, size, field)
                 # print("Ship with size " + str(size))
                 # show_array()
