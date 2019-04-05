@@ -4,54 +4,71 @@ import tkinter
 root = None
 canvas = None
 # другие глобальные переменные
-board_size = 400
-background_color = '#f8f4ff'
-
+cell_side = 25
+background_color = '#f7f2ff'
+lines_color = '#c4bfcc'
+draw_color = '#6521d1'
+field1_left_x = field1_left_y = 50
+field2_left_x = 14 * 25
+field2_left_y = 50
 white_rectangle = "#FFFFFF"
 black_rectangle = '#000000'
+field = []
+field2 = []
 
 
-def init_gui():
-    global root, container1, canvas, w, h
-    root = tkinter.Tk()
-    root.title("SeaCombat")
+def create_grid(w, h):
+    for i in range(0, w, cell_side):
+        canvas.create_line(i, 0, i, h, fill=lines_color)
 
-    w = h = board_size
-    mw = root.winfo_screenwidth()
-    mh = root.winfo_screenheight()
-
-    root.geometry(
-        "{}x{}+{}+{}".format(w + 220, h + 20, (mw - w) // 2, (mh - h) // 2))
-    root.resizable(0, 0)
-
-    container1 = tkinter.Frame(master=root)
-    container1.place(x=0, y=0, width=w + 220, height=h + 20)
-
-    canvas = tkinter.Canvas(master=container1, background=background_color)
+    for i in range(0, h, cell_side):
+        canvas.create_line(0, i, w, i, fill=lines_color)
     canvas.pack(fill=tkinter.BOTH, expand=True)
 
 
-def draw_board(whitecolor=None, blackcolor=None):
-    rect_side = 25
-    coodr_x = coord_y = 50
-    canvas.create_rectangle(coodr_x, coord_y, coodr_x + rect_side * 10,
-                            coord_y + rect_side * 10)
-    # canvas.create_rectangle(350,50,600,300)
+def init_gui():
+    global root, canvas, w, h
+    root = tkinter.Tk()
+    root.title("SeaCombat")
+
+    w = 26 * cell_side
+    h = 14 * cell_side
+    mw = root.winfo_screenwidth()
+    mh = root.winfo_screenheight()
+    root.geometry(
+        "{}x{}+{}+{}".format(w, h, (mw - w) // 2, (mh - h) // 2))
+    root.resizable(0, 0)
+
+    canvas = tkinter.Canvas(master=root, background=background_color)
+    canvas.pack(fill=tkinter.BOTH, expand=True)
+
+    create_grid(w, h)
+    draw_field(field1_left_x, field1_left_y, field)
+    draw_field(field2_left_x, field2_left_y, field2)
+
+
+def draw_field(coord_x, coord_y, field):
+    canvas.create_rectangle(coord_x, coord_y, coord_x + cell_side * 10,
+                            coord_y + cell_side * 10, width=3, outline=draw_color)
+    letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K']
+
+    for ix in range(10):
+        canvas.create_text(coord_x + cell_side * ix + cell_side / 2, coord_y - cell_side / 2, text=letters[ix],
+                           fill=draw_color)
+        canvas.create_text(coord_x - cell_side / 2, coord_y + cell_side * ix + cell_side / 2, text=ix + 1,
+                           fill=draw_color)
     for r in range(1, 11):
         for c in range(1, 11):
-            canvas.create_rectangle(coodr_x + (r - 1) * rect_side,
-                                    coord_y + (c - 1) * rect_side,
-                                    (coodr_x + (r - 1) * rect_side) + 25,
-                                    (coord_y + (c - 1) * rect_side) + 25)
+            if field[r][c] in [1, 2, 3, 4]:
+                canvas.create_rectangle(coord_x + cell_side * (r - 1), coord_y + cell_side * (c - 1),
+                                        coord_x + cell_side * r, coord_y + cell_side * c,
+                                        width=3, outline=draw_color)
 
-    canvas.create_rectangle(50, 50, 75, 75)
-
-
-if __name__ == '__main__':
+def start(f1, f2):
+    field = f1
+    field2 = f2
     init_gui()
-    draw_board()
-
-root.mainloop()
+    root.mainloop()
 
 
 def show_battlefield(field):
