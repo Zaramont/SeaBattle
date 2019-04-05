@@ -4,15 +4,14 @@ import tkinter
 root = None
 canvas = None
 # другие глобальные переменные
-cell_side = 25
+cell_side = 50
 background_color = '#f7f2ff'
 lines_color = '#c4bfcc'
-draw_color = '#6521d1'
-field1_left_x = field1_left_y = 50
-field2_left_x = 14 * 25
-field2_left_y = 50
-white_rectangle = "#FFFFFF"
-black_rectangle = '#000000'
+draw_color = '#3d0084'
+field1_left_x = field1_left_y = cell_side * 2
+field2_left_x = 14 * cell_side
+field2_left_y = cell_side * 2
+
 field = None
 field2 = None
 
@@ -27,7 +26,7 @@ def create_grid(w, h):
 
 
 def init_gui():
-    global root, canvas, w, h
+    global root, canvas
     root = tkinter.Tk()
     root.title("SeaCombat")
 
@@ -48,15 +47,16 @@ def init_gui():
 
 
 def draw_field(coord_x, coord_y, field):
-    canvas.create_rectangle(coord_x, coord_y, coord_x + cell_side * 10,
-                            coord_y + cell_side * 10, width=3, outline=draw_color)
-    letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K']
+    canvas.create_rectangle(coord_x - 1, coord_y - 1, coord_x + 1 + cell_side * 10,
+                            coord_y + 1 + cell_side * 10, width=3, outline=draw_color)
 
+    letters = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ж', 'З', 'И', 'К']
     for ix in range(10):
         canvas.create_text(coord_x + cell_side * ix + cell_side / 2, coord_y - cell_side / 2, text=letters[ix],
                            fill=draw_color)
         canvas.create_text(coord_x - cell_side / 2, coord_y + cell_side * ix + cell_side / 2, text=ix + 1,
                            fill=draw_color)
+
     for r in range(1, 11):
         for c in range(1, 11):
             if field[r][c] in [1, 2, 3, 4]:
@@ -64,8 +64,9 @@ def draw_field(coord_x, coord_y, field):
                                         coord_x + cell_side * r, coord_y + cell_side * c,
                                         width=3, outline=draw_color)
 
+
 def start(f1, f2):
-    global field,field2
+    global field, field2
     field = f1
     field2 = f2
     init_gui()
