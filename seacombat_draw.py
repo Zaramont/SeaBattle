@@ -7,9 +7,9 @@ cell_side = 25
 background_color = '#f7f2ff'
 lines_color = '#c4bfcc'
 draw_color = '#3d0084'
-field1_left_x = field1_left_y = cell_side * 2
-field2_left_x = 14 * cell_side
-field2_left_y = cell_side * 2
+field1_left_x = cell_side * 10
+field2_left_x = 22 * cell_side
+field1_left_y = field2_left_y = cell_side * 2
 
 field = None
 field2 = None
@@ -29,7 +29,7 @@ def init_gui():
     root = tkinter.Tk()
     root.title("SeaCombat")
 
-    w = 26 * cell_side
+    w = 34 * cell_side
     h = 14 * cell_side
     mw = root.winfo_screenwidth()
     mh = root.winfo_screenheight()
@@ -63,20 +63,24 @@ def draw_field(coord_x, coord_y, field):
 
     for r in range(1, 11):
         for c in range(1, 11):
-            if field[r][c] in [1, 2, 3, 4]:
-                canvas.create_rectangle(coord_x + cell_side * (r - 1),
-                                        coord_y + cell_side * (c - 1),
-                                        coord_x + cell_side * r,
-                                        coord_y + cell_side * c,
+            if field[r][c] in [1, 2, 3, 4]: # remember this bug)
+                # print("c= " + str(c) + " r= " + str(r))
+                canvas.create_rectangle(coord_x + cell_side * (c - 1),
+                                        coord_y + cell_side * (r - 1),
+                                        coord_x + cell_side * c,
+                                        coord_y + cell_side * r,
                                         width=3, outline=draw_color)
 
 
 def start(f1, f2):
-    global field, field2
-    field = f1
-    field2 = f2
-    init_gui()
-    root.mainloop()
+    try:
+        global field, field2
+        field = f1
+        field2 = f2
+        init_gui()
+        root.mainloop()
+    except Exception as e:
+        print(e)
 
 
 def show_battlefield(field):

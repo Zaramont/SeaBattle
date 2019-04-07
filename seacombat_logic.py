@@ -29,6 +29,22 @@ def place_ship(row, column, direction, size, field):
                 else:
                     field[r][c] = 9
 
+def get_blank_field():
+    field = [
+        [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
+    ]
+    return field
 
 def get_arranged_ships():
     size = 4
@@ -52,9 +68,9 @@ def get_arranged_ships():
         [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
     ]
 
-    while (size > 0):
+    while size > 0:
         quantity = 5 - size
-        while (quantity > 0):
+        while quantity > 0:
             row = random.randint(1, 10)
             column = random.randint(1, 10)
             if field[row][column] != 0: continue
