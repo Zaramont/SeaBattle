@@ -45,37 +45,61 @@ def init_gui():
     draw_field(field2_left_x, field2_left_y, field2)
 
 
-def draw_orange(event):
-    r = 5
-    canvas.create_oval(event.x - r, event.y - r,
-                       event.x + r, event.y + r, fill='orange')
+def delete_ship(event):
+    canvas.unbind('<Motion>')
+    canvas.delete('new_ship')
+
+
+def rotate_ship(event):
+    pass
 
 
 def create_ship(event):
-    canvas.create_rectangle(event.x, event.y,
-                            event.x + cell_side,
-                            event.y + cell_side, width=3, outline=draw_color)  # .bind('Motion', lambda event2: canvas.move(event2.self, event2.x,event2.y))
-    pass
+    ship = canvas.find_closest(event.x, event.y)
+    ship_coords = canvas.coords(ship)
+    ship_size = (ship_coords[2] - ship_coords[0]) / cell_side
+    width = cell_side * ship_size
+    x = event.x - width / 2
+    y = event.y - cell_side / 2
+    root.bind('<Escape>', delete_ship)
+    canvas.bind('<Button-3>', rotate_ship)
+    canvas.create_rectangle(x, y,
+                            x + cell_side * ship_size,
+                            y + cell_side, width=3, outline=draw_color,
+                            tags='new_ship')
+    canvas.bind('<Motion>', move_ship_by_mouse)
+
+
+def move_ship_by_mouse(event):
+    ship = canvas.coords('new_ship')
+    ship_x = (ship[2] - ship[0]) / 2
+    ship_y = (ship[3] - ship[1]) / 2
+    canvas.move('new_ship', event.x - ship[0] - ship_x,
+                event.y - ship[1] - ship_y)
 
 
 def draw_list_of_ships():
-    for ix in range(1, 5):
-        canvas.create_text(cell_side * 2.5, cell_side * 0.5 + cell_side * ix * 2,
-                           text=ix, fill=draw_color, width=3)
-        canvas.create_text(cell_side * 3.5, cell_side * 0.5 + cell_side * ix * 2, text='x', fill=draw_color, width=3)
-        # ship4 = tkinter.Canvas(root, bg=background_color)
-        # ship4.place(x=cell_side * 4 + 2, y=cell_side * ix * 2 + 2, width=cell_side * (5 - ix) - 3, height=cell_side - 3)
-        # ship4.bind('<Button-1>', create_ship)
-
-        for q in range(5 - ix, 0, -1):
-            left_x = q * cell_side + 3 * cell_side
-            left_y = ix * 2 * cell_side
-            canvas.create_rectangle(left_x, left_y,
-                                    left_x + cell_side,
-                                    left_y + cell_side,
-                                    width=3, outline=draw_color, fill=background_color, tags='ship' + str(5 - ix))
-            canvas.tag_bind('ship' + str(5 - ix), '<Button-1>', create_ship)
-    pass
+    size = 4
+    while size > 0:
+        canvas.create_text(cell_side * 2.5,
+                           cell_side * 0.5 + cell_side * (5 - size) * 2,
+                           text=5 - size, fill=draw_color, width=3)
+        canvas.create_text(cell_side * 3.5,
+                           cell_side * 0.5 + cell_side * (5 - size) * 2,
+                           text='x',
+                           fill=draw_color,
+                           width=3)
+        left_x = cell_side * 4
+        left_y = 2 * cell_side * (5 - size)
+        canvas.create_rectangle(left_x, left_y, left_x + cell_side * size,
+                                left_y + cell_side,
+                                width=3, outline=draw_color,
+                                fill=background_color,
+                                tags='ship' + str(size))
+        canvas.tag_bind('ship' + str(size), '<Button-1>', create_ship)
+        # lambda event: create_ship(event, size))
+        canvas.update()
+        size -= 1
 
 
 def draw_field(coord_x, coord_y, field):
@@ -112,6 +136,7 @@ def start(f1, f2):
         field2 = f2
         init_gui()
         draw_list_of_ships()
+        root.focus_set()
         root.mainloop()
     except Exception as e:
         print(e)
