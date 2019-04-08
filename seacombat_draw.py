@@ -45,6 +45,39 @@ def init_gui():
     draw_field(field2_left_x, field2_left_y, field2)
 
 
+def draw_orange(event):
+    r = 5
+    canvas.create_oval(event.x - r, event.y - r,
+                       event.x + r, event.y + r, fill='orange')
+
+
+def create_ship(event):
+    canvas.create_rectangle(event.x, event.y,
+                            event.x + cell_side,
+                            event.y + cell_side, width=3, outline=draw_color)  # .bind('Motion', lambda event2: canvas.move(event2.self, event2.x,event2.y))
+    pass
+
+
+def draw_list_of_ships():
+    for ix in range(1, 5):
+        canvas.create_text(cell_side * 2.5, cell_side * 0.5 + cell_side * ix * 2,
+                           text=ix, fill=draw_color, width=3)
+        canvas.create_text(cell_side * 3.5, cell_side * 0.5 + cell_side * ix * 2, text='x', fill=draw_color, width=3)
+        # ship4 = tkinter.Canvas(root, bg=background_color)
+        # ship4.place(x=cell_side * 4 + 2, y=cell_side * ix * 2 + 2, width=cell_side * (5 - ix) - 3, height=cell_side - 3)
+        # ship4.bind('<Button-1>', create_ship)
+
+        for q in range(5 - ix, 0, -1):
+            left_x = q * cell_side + 3 * cell_side
+            left_y = ix * 2 * cell_side
+            canvas.create_rectangle(left_x, left_y,
+                                    left_x + cell_side,
+                                    left_y + cell_side,
+                                    width=3, outline=draw_color, fill=background_color, tags='ship' + str(5 - ix))
+            canvas.tag_bind('ship' + str(5 - ix), '<Button-1>', create_ship)
+    pass
+
+
 def draw_field(coord_x, coord_y, field):
     canvas.create_rectangle(coord_x - 1, coord_y - 1,
                             coord_x + 1 + cell_side * 10,
@@ -63,7 +96,7 @@ def draw_field(coord_x, coord_y, field):
 
     for r in range(1, 11):
         for c in range(1, 11):
-            if field[r][c] in [1, 2, 3, 4]: # remember this bug)
+            if field[r][c] in [1, 2, 3, 4]:  # remember this bug)
                 # print("c= " + str(c) + " r= " + str(r))
                 canvas.create_rectangle(coord_x + cell_side * (c - 1),
                                         coord_y + cell_side * (r - 1),
@@ -78,6 +111,7 @@ def start(f1, f2):
         field = f1
         field2 = f2
         init_gui()
+        draw_list_of_ships()
         root.mainloop()
     except Exception as e:
         print(e)
