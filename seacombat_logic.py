@@ -26,19 +26,20 @@ def is_ships_placement_legal(field):
 
                 ship_size = field[r][i]
                 for s in range(ship_size):
-                    if field[r - 1][i + s - 1] != 9:  # check  that there aren't ships on diagonals
+                    if field[r - 1][i + s - 1] not in [0, 9]:  # check  that there aren't ships on diagonals
                         return False
-                    if field[r - 1][i + s + 1] != 9:
+                    if field[r - 1][i + s + 1] not in [0, 9]:
                         return False
-                    if field[r + 1][i + s - 1] != 9:
+                    if field[r + 1][i + s - 1] not in [0, 9]:
                         return False
-                    if field[r + 1][i + s + 1] != 9:
+                    if field[r + 1][i + s + 1] not in [0, 9]:
                         return False
 
                     if s + 1 == ship_size:  # if last part of ship or ship with one deck
-                        if field[r][i + s + 1] != 9:  # check next point
+                        if field[r][i + s + 1] not in [0, 9]:  # check next point
                             return False
-                        if field[r - 1][i + s] != 9 or field[r + 1][i + s] != 9:  # check points up and down
+                        if field[r - 1][i + s] not in [0, 9] or field[r + 1][i + s] not in [0,
+                                                                                            9]:  # check points up and down
                             return False
                         i = i + ship_size
 
@@ -53,13 +54,13 @@ def is_ships_placement_legal(field):
                         continue
 
                     if field[r][i + s + 1] == ship_size:
-                        if field[r - 1][i + s] != 9 or field[r + 1][i + s] != 9:
+                        if field[r - 1][i + s] not in [0, 9] or field[r + 1][i + s] not in [0, 9]:
                             return False
-                    elif field[r][i + s + 1] == 9:
-                        if field[r + 1][i + s] == ship_size and field[r - 1][i + s] == 9:
+                    elif field[r][i + s + 1] in [0, 9]:
+                        if field[r + 1][i + s] == ship_size and field[r - 1][i + s] in [0, 9]:
                             for ix in range(1, ship_size):
                                 if ix + 1 == ship_size:
-                                    if field[r + ix + 1][i + s] == 9:
+                                    if field[r + ix + 1][i + s] in [0, 9]:
                                         if ship_size == 1:
                                             one_deck += 1
                                         elif ship_size == 2:
