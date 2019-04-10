@@ -1,24 +1,6 @@
 import random
 
 
-def can_place_ship(row, column, direction, size, field):
-    list_of_ships = []
-    ship1 = get_ship(row, column, direction, size)
-    wrong_decks = [deck for deck in ship1 if deck[0] > 10 or deck[0] < 1 or deck[1] > 10 or deck[1] < 1]
-
-    if len(wrong_decks) > 0:
-        return False
-
-    for i in field:
-        list_of_ships.extend(field[i])
-
-    for ship2 in list_of_ships:
-        if are_ships_crossed(ship1, ship2):
-            return False
-
-    return True
-
-
 def are_ships_crossed(ship1, ship2):
     ship1_set = get_ship_with_area_around(ship1)
     ship2_set = get_ship_with_area_around(ship2)
@@ -29,26 +11,78 @@ def are_ships_crossed(ship1, ship2):
     return False
 
 
-def is_ships_placement_legal(field):
+def can_place_ship(row, column, direction, size, field):
     list_of_ships = []
-    # ship1 = get_ship(row, column, direction, size)
-    # wrong_decks = [deck for deck in ship1 if deck[0] > 10 or deck[0] < 1 or deck[1] > 10 or deck[1] < 1]
-    # if len(wrong_decks) > 0:
-    #     return False
+    ship1 = get_ship(row, column, direction, size)
+
+    wrong_decks = [deck for deck in ship1 if
+                   deck[0] > 10 or deck[0] < 1 or deck[1] > 10 or deck[1] < 1]
+    if len(wrong_decks) > 0:
+        return False
 
     for size in field:
-        if field[size] == 5-size:
+        if field[size] < 5 - size:
             list_of_ships.extend(field[size])
         else:
             return False
 
-    for ix in len(list_of_ships) - 1:
-        ship1 = list_of_ships[ix]
-        for iy in len(ix + 1, list_of_ships):
-            ship2 = list_of_ships[iy]
-            if are_ships_crossed(ship1, ship2):
+    for ship2 in list_of_ships:
+        if are_ships_crossed(ship1, ship2):
+            return False
+
+    return True
+
+
+def is_ships_placement_legal(field):
+    list_of_ships = []
+
+    for size in field:
+        if field[size] == 5 - size:
+            list_of_ships.extend(field[size])
+        else:
+            return False
+    for ship in list_of_ships:
+        wrong_decks = [deck for deck in ship if
+                       deck[0] > 10 or deck[0] < 1 or
+                       deck[1] > 10 or deck[1] < 1
+                       ]
+        if len(wrong_decks) > 0:
+            return False
+
+    quantity = len(list_of_ships)
+    for ix in range(quantity - 1):
+        for iy in (ix + 1, quantity):
+            if are_ships_crossed(list_of_ships[ix], list_of_ships[iy]):
                 return False
     return True
+
+
+def get_arranged_ships():
+    size = 4
+    field = get_blank_field()
+
+    while size > 0:
+        quantity = 5 - size
+        while quantity > 0:
+            row = random.randint(1, 10)
+            column = random.randint(1, 10)
+            direction = random.randint(0, 1)  # 0 - vertical, 1 - horizontal
+
+            if can_place_ship(row, column, direction, size, field):
+                place_ship(row, column, direction, size, field)
+                quantity = quantity - 1
+            elif can_place_ship(row, column, 1 - direction, size, field):
+                place_ship(row, column, 1 - direction, size, field)
+                quantity = quantity - 1
+            else:
+                continue
+        size = size - 1
+    return field
+
+
+def get_blank_field():
+    field = {1: [], 2: [], 3: [], 4: []}
+    return field
 
 
 def get_ship(row, column, direction, size):
@@ -79,31 +113,3 @@ def place_ship(row, column, direction, size, field):
     ship = get_ship(row, column, direction, size)
     field[size].append(ship)
     # seacombat_draw.show_dict_field(field)
-
-
-def get_blank_field():
-    field = {1: [], 2: [], 3: [], 4: []}
-    return field
-
-
-def get_arranged_ships():
-    size = 4
-    field = get_blank_field()
-
-    while size > 0:
-        quantity = 5 - size
-        while quantity > 0:
-            row = random.randint(1, 10)
-            column = random.randint(1, 10)
-            direction = random.randint(0, 1)  # 0 - vertical, 1 - horizontal
-
-            if can_place_ship(row, column, direction, size, field):
-                place_ship(row, column, direction, size, field)
-                quantity = quantity - 1
-            elif can_place_ship(row, column, 1 - direction, size, field):
-                place_ship(row, column, 1 - direction, size, field)
-                quantity = quantity - 1
-            else:
-                continue
-        size = size - 1
-    return field
