@@ -41,6 +41,7 @@ def create_ship(event):
     canvas.create_rectangle(x, y,
                             x + cell_side * ship_size,
                             y + cell_side, width=3, outline=draw_color,
+                            fill=background_color,
                             tags='new_ship')
     root.bind('<Escape>', delete_ship)
     canvas.bind('<Button-1>', place_ship)
