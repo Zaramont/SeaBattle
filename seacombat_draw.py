@@ -1,8 +1,6 @@
 import math
 import tkinter
 
-import seacombat_logic
-
 root = None
 canvas = None
 
@@ -14,9 +12,6 @@ field1_left_x = cell_side * 10
 field2_left_x = 22 * cell_side
 field1_left_y = field2_left_y = cell_side * 2
 
-field = None
-field2 = None
-
 
 def create_grid(w, h):
     for i in range(0, w, cell_side):
@@ -27,39 +22,11 @@ def create_grid(w, h):
     canvas.pack(fill=tkinter.BOTH, expand=True)
 
 
-def create_ship(event):
-    if canvas.coords('new_ship'):  # prevent creation of two new ships
-        return
-
-    ship = canvas.find_closest(event.x, event.y)
-    ship_coords = canvas.coords(ship)
-    ship_size = (ship_coords[2] - ship_coords[0]) / cell_side
-
-    width = cell_side * ship_size
-    x = event.x - width / 2
-    y = event.y - cell_side / 2
-    canvas.create_rectangle(x, y,
-                            x + cell_side * ship_size,
-                            y + cell_side, width=3, outline=draw_color,
-                            fill=background_color,
-                            tags='new_ship')
-    root.bind('<Escape>', delete_ship)
-    canvas.bind('<Button-1>', place_ship)
-    canvas.bind('<Button-3>', rotate_ship)
-    canvas.bind('<Motion>', move_ship_by_mouse)
-    # canvas.bind('<Button-1>', indicate_legal_state) # for test
-
-
-def delete_ship(event):
-    canvas.unbind('<Motion>')
-    canvas.unbind('<Button-1>')
-    canvas.unbind('<Button-3>')
-    canvas.delete('new_ship')
-
-
 def draw_list_of_ships():
     size = 4
+    ships = []
     while size > 0:
+
         canvas.create_text(cell_side * 2.5,
                            cell_side * 0.5 + cell_side * (5 - size) * 2,
                            text=5 - size, fill=draw_color, width=3)
@@ -71,15 +38,15 @@ def draw_list_of_ships():
 
         left_x = cell_side * 4
         left_y = 2 * cell_side * (5 - size)
-        canvas.create_rectangle(left_x, left_y, left_x + cell_side * size,
+        ships.append(canvas.create_rectangle(left_x, left_y, left_x + cell_side * size,
                                 left_y + cell_side,
                                 width=3, outline=draw_color,
                                 fill=background_color,
-                                tags='ship' + str(size))
-        canvas.tag_bind('ship' + str(size), '<Button-1>', create_ship)
+                                tags='ship'))
         # lambda event: create_ship(event, size))
         # canvas.update()
         size -= 1
+    return ships
 
 
 def draw_field(coord_x, coord_y, field, tag):
@@ -112,24 +79,7 @@ def draw_field(coord_x, coord_y, field, tag):
                                     width=3, outline=draw_color)
 
 
-def find_array_indexes(coord_x, coord_y):
-    field_coords = canvas.coords('player_field')
-    offset_x = coord_x - field_coords[0]
-    offset_y = coord_y - field_coords[1]
-    row = offset_y / cell_side
-    column = offset_x / cell_side
-    return math.ceil(row), math.ceil(column)
-    # print("row= {} column= {}".format(row, column))
 
-
-def indicate_legal_state(event):
-    if placement_legal(event):
-        elem = canvas.find_withtag('new_ship')[0]
-        canvas.itemconfig(elem, outline='blue')
-    else:
-        elem = canvas.find_withtag('new_ship')[0]
-        canvas.itemconfig(elem, outline='red')
-    # canvas.create_rectangle(event.x, event.y, event.x + 3 * cell_side, event.y + cell_side)
 
 
 def init_gui():
@@ -151,80 +101,12 @@ def init_gui():
     create_grid(w, h)
     draw_field(field1_left_x, field1_left_y, field, 'player_field')
     draw_field(field2_left_x, field2_left_y, field2, 'ai_field')
+    return canvas
 
-
-def move_ship_by_mouse(event):
-    indicate_legal_state(event)
-    ship = canvas.coords('new_ship')
-    ship_x = (ship[2] - ship[0]) / 2
-    ship_y = (ship[3] - ship[1]) / 2
-    canvas.move('new_ship', event.x - ship[0] - ship_x,
-                event.y - ship[1] - ship_y)
-
-
-def placement_legal(event):
-    ship = get_ship_tuple_by_coords(event)
-    if seacombat_logic.can_place_ship(ship[0],ship[1],ship[2],ship[3], field):
-        return True
-    else:
-        return False
-
-
-def place_ship(event):
-    ship = get_ship_tuple_by_coords(event)
-    if seacombat_logic.can_place_ship(ship[0],ship[1],ship[2],ship[3], field):
-        field[ship[3]].append(seacombat_logic.get_ship(ship[0],ship[1],ship[2],ship[3]))
-        delete_ship(event)
-        redraw_field(field1_left_x, field1_left_y, field, 'player_field')
-
-
-def get_rect_coords(tag):
-    return canvas.coords(tag)
-
-
-def get_ship_tuple_by_coords(event):
-    field_coords = get_rect_coords('player_field')
-    ship_coords = get_rect_coords('new_ship')
-    left_x = ship_coords[0]
-    top_y = ship_coords[1]
-    right_x = ship_coords[2]
-    down_y = ship_coords[3]
-    if right_x - left_x > down_y - top_y:
-        direction = 1
-        ship_size = int((right_x - left_x) / cell_side)
-    else:
-        direction = 0
-        ship_size = int((down_y - top_y) / cell_side)
-
-    if direction == 1:
-        indexes = find_array_indexes(left_x + cell_side / 2,
-                                     event.y)
-    else:
-        indexes = find_array_indexes(event.x,
-                                     top_y + cell_side / 2)
-    return (indexes[0], indexes[1], direction, ship_size)
 
 
 def redraw_field(x, y, field3, tag):
     draw_field(x, y, field3, tag)
-
-
-def rotate_ship(event):
-    ship_coords = canvas.coords('new_ship')
-    left_x = ship_coords[0]
-    top_y = ship_coords[1]
-    right_x = ship_coords[2]
-    down_y = ship_coords[3]
-
-    central_point_x = (right_x - left_x) / 2
-    central_point_y = (down_y - top_y) / 2
-    canvas.coords('new_ship',
-                  ship_coords[0] + central_point_x - central_point_y,
-                  ship_coords[1] - central_point_x + central_point_y,
-                  ship_coords[2] - central_point_x + central_point_y,
-                  ship_coords[3] + central_point_x - central_point_y)
-
-    indicate_legal_state(event)
 
 
 def start(f1, f2):
@@ -280,3 +162,21 @@ def show_dict_field(field):
         for deck in ship:
             field2[deck[0]][deck[1]] = len(ship)
     show_battlefield(field2)
+
+
+def create_rectangle(event_x,event_y,tag):
+    if canvas.coords('new_ship'):  # prevent creation of two new ships
+        return
+
+    ship = canvas.find_closest(event_x, event_y)
+    ship_coords = canvas.coords(ship)
+    ship_size = (ship_coords[2] - ship_coords[0]) / cell_side
+
+    width = cell_side * ship_size
+    x = event_x - width / 2
+    y = event_y - cell_side / 2
+    return canvas.create_rectangle(x, y,
+                            x + cell_side * ship_size,
+                            y + cell_side, width=3, outline=draw_color,
+                            fill=background_color,
+                            tags=tag)
