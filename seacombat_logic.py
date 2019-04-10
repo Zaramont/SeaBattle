@@ -21,7 +21,7 @@ def can_place_ship(row, column, direction, size, field):
         return False
 
     for size in field:
-        if field[size] < 5 - size:
+        if len(field[size]) <= (5 - size):
             list_of_ships.extend(field[size])
         else:
             return False
@@ -37,7 +37,7 @@ def is_ships_placement_legal(field):
     list_of_ships = []
 
     for size in field:
-        if field[size] == 5 - size:
+        if len(field[size]) == (5 - size):
             list_of_ships.extend(field[size])
         else:
             return False
