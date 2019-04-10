@@ -1,5 +1,5 @@
 import random
-import seacombat_draw
+
 
 def can_place_ship(row, column, direction, size, field):
     list_of_ships = []
@@ -13,93 +13,41 @@ def can_place_ship(row, column, direction, size, field):
         list_of_ships.extend(field[i])
 
     for ship2 in list_of_ships:
-        if are_ships_touched(ship1, ship2):
+        if are_ships_crossed(ship1, ship2):
             return False
 
     return True
 
 
-def are_ships_touched(ship1, ship2):
+def are_ships_crossed(ship1, ship2):
     ship1_set = get_ship_with_area_around(ship1)
     ship2_set = get_ship_with_area_around(ship2)
     common_set = ship1_set & ship2_set
     if len(common_set) > 0:
-        if len(ship1 & common_set)>0 or len(ship2 & common_set)>0:
+        if len(ship1 & common_set) > 0 or len(ship2 & common_set) > 0:
             return True
     return False
 
 
 def is_ships_placement_legal(field):
-    one_deck = 0
-    two_deck = 0
-    three_deck = 0
-    four_deck = 0
+    list_of_ships = []
+    # ship1 = get_ship(row, column, direction, size)
+    # wrong_decks = [deck for deck in ship1 if deck[0] > 10 or deck[0] < 1 or deck[1] > 10 or deck[1] < 1]
+    # if len(wrong_decks) > 0:
+    #     return False
 
-    for r in range(1, 11):
-        i = 1
-        while i < 11:
-            if field[r][i] in [1, 2, 3, 4]:
+    for size in field:
+        if field[size] == 5-size:
+            list_of_ships.extend(field[size])
+        else:
+            return False
 
-                ship_size = field[r][i]
-                for s in range(ship_size):
-                    if field[r - 1][i + s - 1] not in [0, 9]:  # check  that there aren't ships on diagonals
-                        return False
-                    if field[r - 1][i + s + 1] not in [0, 9]:
-                        return False
-                    if field[r + 1][i + s - 1] not in [0, 9]:
-                        return False
-                    if field[r + 1][i + s + 1] not in [0, 9]:
-                        return False
-
-                    if s + 1 == ship_size:  # if last part of ship or ship with one deck
-                        if field[r][i + s + 1] not in [0, 9]:  # check next point
-                            return False
-                        if field[r - 1][i + s] not in [0, 9] or field[r + 1][i + s] not in [0,
-                                                                                            9]:  # check points up and down
-                            return False
-                        i = i + ship_size
-
-                        if ship_size == 1:
-                            one_deck += 1
-                        elif ship_size == 2:
-                            two_deck += 1
-                        elif ship_size == 3:
-                            three_deck += 1
-                        elif ship_size == 4:
-                            four_deck += 1
-                        continue
-
-                    if field[r][i + s + 1] == ship_size:
-                        if field[r - 1][i + s] not in [0, 9] or field[r + 1][i + s] not in [0, 9]:
-                            return False
-                    elif field[r][i + s + 1] in [0, 9]:
-                        if field[r + 1][i + s] == ship_size and field[r - 1][i + s] in [0, 9]:
-                            for ix in range(1, ship_size):
-                                if ix + 1 == ship_size:
-                                    if field[r + ix + 1][i + s] in [0, 9]:
-                                        if ship_size == 1:
-                                            one_deck += 1
-                                        elif ship_size == 2:
-                                            two_deck += 1
-                                        elif ship_size == 3:
-                                            three_deck += 1
-                                        elif ship_size == 4:
-                                            four_deck += 1
-                                        break
-                                elif field[r + ix + 1][i + s] == ship_size:
-                                    continue
-                                return False
-                            i += 1
-                            break
-                        elif field[r - 1][i + s] == ship_size:
-                            i += 1
-                            break
-            elif field[r][i] not in [0, 9]:
+    for ix in len(list_of_ships) - 1:
+        ship1 = list_of_ships[ix]
+        for iy in len(ix + 1, list_of_ships):
+            ship2 = list_of_ships[iy]
+            if are_ships_crossed(ship1, ship2):
                 return False
-            else:
-                i += 1
-    if one_deck > 4 or two_deck > 3 or three_deck > 2 or four_deck > 1:
-        return False
     return True
 
 
@@ -131,6 +79,7 @@ def place_ship(row, column, direction, size, field):
     ship = get_ship(row, column, direction, size)
     field[size].append(ship)
     # seacombat_draw.show_dict_field(field)
+
 
 def get_blank_field():
     field = {1: [], 2: [], 3: [], 4: []}
