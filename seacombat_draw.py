@@ -1,4 +1,3 @@
-import copy
 import math
 import tkinter
 
@@ -98,15 +97,18 @@ def draw_field(coord_x, coord_y, field, tag):
                            text=ix + 1,
                            fill=draw_color)
 
-    for r in range(1, 11):
-        for c in range(1, 11):
-            if field[r][c] in [1, 2, 3, 4]:  # remember this bug)
-                # print("c= " + str(c) + " r= " + str(r))
-                canvas.create_rectangle(coord_x + cell_side * (c - 1),
-                                        coord_y + cell_side * (r - 1),
-                                        coord_x + cell_side * c,
-                                        coord_y + cell_side * r,
-                                        width=3, outline=draw_color)
+    list_of_ships = []
+    for size in field:
+        list_of_ships.extend(field[size])
+    for ship in list_of_ships:
+        for deck in ship:
+            c = deck[1]
+            r = deck[0]
+            canvas.create_rectangle(coord_x + cell_side * (c - 1),
+                                    coord_y + cell_side * (r - 1),
+                                    coord_x + cell_side * c,
+                                    coord_y + cell_side * r,
+                                    width=3, outline=draw_color)
 
 
 def find_array_indexes(coord_x, coord_y):
@@ -160,22 +162,32 @@ def move_ship_by_mouse(event):
 
 
 def placement_legal(event):
-    global field3
-    field3 = copy.deepcopy(field)
+    ship = get_ship_tuple_by_coords(event)
+    if seacombat_logic.can_place_ship(ship[0],ship[1],ship[2],ship[3], field):
+        return True
+    else:
+        return False
 
-    field_coords = canvas.coords('player_field')
-    ship_coords = canvas.coords('new_ship')
+
+def place_ship(event):
+    ship = get_ship_tuple_by_coords(event)
+    if seacombat_logic.can_place_ship(ship[0],ship[1],ship[2],ship[3], field):
+        field[ship[3]].append(seacombat_logic.get_ship(ship[0],ship[1],ship[2],ship[3]))
+        delete_ship(event)
+        redraw_field(field1_left_x, field1_left_y, field, 'player_field')
+
+
+def get_rect_coords(tag):
+    return canvas.coords(tag)
+
+
+def get_ship_tuple_by_coords(event):
+    field_coords = get_rect_coords('player_field')
+    ship_coords = get_rect_coords('new_ship')
     left_x = ship_coords[0]
     top_y = ship_coords[1]
     right_x = ship_coords[2]
     down_y = ship_coords[3]
-
-    if left_x + cell_side / 2 < field_coords[0] or right_x - cell_side / 2 > field_coords[2]:
-        return False
-    elif top_y + cell_side / 2 < field_coords[1] or down_y - cell_side / 2 > field_coords[3]:
-        return False
-
-    # direction 1-horizontal, 0 - vertical
     if right_x - left_x > down_y - top_y:
         direction = 1
         ship_size = int((right_x - left_x) / cell_side)
@@ -183,34 +195,13 @@ def placement_legal(event):
         direction = 0
         ship_size = int((down_y - top_y) / cell_side)
 
-    for n in range(ship_size):
-        if direction == 1:
-            indexes = find_array_indexes(left_x + n * cell_side + cell_side / 2, event.y)
-            if indexes[0] > 10 or indexes[1] > 10:
-                return False
-            if field3[indexes[0]][indexes[1]] in [1, 2, 3, 4]:
-                return False
-            field3[indexes[0]][indexes[1]] = ship_size
-            # array.append(indexes[0])
-            # array.append(indexes[1])
-        else:
-            indexes = find_array_indexes(event.x, top_y + n * cell_side + cell_side / 2)
-
-            if field3[indexes[0]][indexes[1]] in [1, 2, 3, 4]:
-                return False
-            field3[indexes[0]][indexes[1]] = ship_size
-    if seacombat_logic.is_ships_placement_legal(field3):
-        return True
+    if direction == 1:
+        indexes = find_array_indexes(left_x + cell_side / 2,
+                                     event.y)
     else:
-        return False
-
-
-def place_ship(event):
-    if placement_legal(event):
-        global field
-        field = field3
-        delete_ship(event)
-        redraw_field(field1_left_x, field1_left_y, field, 'player_field')
+        indexes = find_array_indexes(event.x,
+                                     top_y + cell_side / 2)
+    return (indexes[0], indexes[1], direction, ship_size)
 
 
 def redraw_field(x, y, field3, tag):
@@ -226,9 +217,11 @@ def rotate_ship(event):
 
     central_point_x = (right_x - left_x) / 2
     central_point_y = (down_y - top_y) / 2
-    canvas.coords('new_ship', ship_coords[0] + central_point_x - central_point_y,
-                  ship_coords[1] - central_point_x + central_point_y , ship_coords[2] - central_point_x + central_point_y,
-                  ship_coords[3] + central_point_x - central_point_y )
+    canvas.coords('new_ship',
+                  ship_coords[0] + central_point_x - central_point_y,
+                  ship_coords[1] - central_point_x + central_point_y,
+                  ship_coords[2] - central_point_x + central_point_y,
+                  ship_coords[3] + central_point_x - central_point_y)
 
     indicate_legal_state(event)
 
@@ -262,6 +255,7 @@ def show_array(field):
     print()
     for r in field:
         print(r)
+
 
 def show_dict_field(field):
     field2 = [

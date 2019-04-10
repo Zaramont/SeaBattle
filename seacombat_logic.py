@@ -17,14 +17,11 @@ def can_place_ship(row, column, direction, size, field):
 
     wrong_decks = [deck for deck in ship1 if
                    deck[0] > 10 or deck[0] < 1 or deck[1] > 10 or deck[1] < 1]
-    if len(wrong_decks) > 0:
+    if len(wrong_decks) > 0 or len(field[size]) == 5 - size:
         return False
 
-    for size in field:
-        if len(field[size]) <= (5 - size):
-            list_of_ships.extend(field[size])
-        else:
-            return False
+    for i in field:
+        list_of_ships.extend(field[i])
 
     for ship2 in list_of_ships:
         if are_ships_crossed(ship1, ship2):
