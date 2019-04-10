@@ -259,5 +259,29 @@ def show_battlefield(field):
 
 
 def show_array(field):
+    print()
     for r in field:
         print(r)
+
+def show_dict_field(field):
+    field2 = [
+        [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+        [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
+    ]
+    list_of_ships = []
+    for i in field:
+        list_of_ships.extend(field[i])
+    for ship in list_of_ships:
+        for deck in ship:
+            field2[deck[0]][deck[1]] = len(ship)
+    show_battlefield(field2)

@@ -1,16 +1,32 @@
 import random
-
+import seacombat_draw
 
 def can_place_ship(row, column, direction, size, field):
-    if direction == 1:
-        if column + size - 1 > 10: return False
-        for x in range(0, size):
-            if field[row][column + x] != 0: return False
-    elif direction == 0:
-        if row + size - 1 > 10: return False
-        for x in range(0, size):
-            if field[row + x][column] != 0: return False
+    list_of_ships = []
+    ship1 = get_ship(row, column, direction, size)
+    wrong_decks = [deck for deck in ship1 if deck[0] > 10 or deck[0] < 1 or deck[1] > 10 or deck[1] < 1]
+
+    if len(wrong_decks) > 0:
+        return False
+
+    for i in field:
+        list_of_ships.extend(field[i])
+
+    for ship2 in list_of_ships:
+        if are_ships_touched(ship1, ship2):
+            return False
+
     return True
+
+
+def are_ships_touched(ship1, ship2):
+    ship1_set = get_ship_with_area_around(ship1)
+    ship2_set = get_ship_with_area_around(ship2)
+    common_set = ship1_set & ship2_set
+    if len(common_set) > 0:
+        if len(ship1 & common_set)>0 or len(ship2 & common_set)>0:
+            return True
+    return False
 
 
 def is_ships_placement_legal(field):
@@ -87,80 +103,56 @@ def is_ships_placement_legal(field):
     return True
 
 
-def place_ship(row, column, direction, size, field):
+def get_ship(row, column, direction, size):
+    coord_set = set()
     if direction == 1:
-        for r in range(row - 1, row + 2):
-            for c in range(column - 1, column + size + 1):
-                if r == row and (column - 1 < c and c < column + size):
-                    field[r][c] = size
-                else:
-                    field[r][c] = 9
+        for n in range(size):
+            deck = row, column + n, 0
+            coord_set.add(deck)
     elif direction == 0:
-        for r in range(row - 1, row + size + 1):
-            for c in range(column - 1, column + 1 + 1):
-                if (row - 1 < r and r < row + size) and c == column:
-                    field[r][c] = size
-                else:
-                    field[r][c] = 9
+        for n in range(size):
+            deck = row + n, column, 0
+            coord_set.add(deck)
+    return coord_set
 
+
+def get_ship_with_area_around(ship):
+    surrounded_ship = set()
+    for deck in ship:
+        temp_set = set()
+        for r in range(deck[0] - 1, deck[0] + 2):
+            for c in range(deck[1] - 1, deck[1] + 2):
+                temp_set.add((r, c, 0))
+        surrounded_ship = surrounded_ship | temp_set
+    return surrounded_ship
+
+
+def place_ship(row, column, direction, size, field):
+    ship = get_ship(row, column, direction, size)
+    field[size].append(ship)
+    # seacombat_draw.show_dict_field(field)
 
 def get_blank_field():
-    field = [
-        [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
-    ]
+    field = {1: [], 2: [], 3: [], 4: []}
     return field
 
 
 def get_arranged_ships():
     size = 4
-    quantity = 1
-    row = 0
-    column = 0
-    direction = 0
-
-    field = [
-        [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-        [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
-    ]
+    field = get_blank_field()
 
     while size > 0:
         quantity = 5 - size
         while quantity > 0:
             row = random.randint(1, 10)
             column = random.randint(1, 10)
-            if field[row][column] != 0: continue
-            direction = random.randint(0, 1)  # 0 - down, 1 - right
+            direction = random.randint(0, 1)  # 0 - vertical, 1 - horizontal
 
             if can_place_ship(row, column, direction, size, field):
                 place_ship(row, column, direction, size, field)
-                # print("Ship with size " + str(size))
-                # show_array()
                 quantity = quantity - 1
             elif can_place_ship(row, column, 1 - direction, size, field):
                 place_ship(row, column, 1 - direction, size, field)
-                # print("Ship with size " + str(size))
-                # show_array()
                 quantity = quantity - 1
             else:
                 continue
