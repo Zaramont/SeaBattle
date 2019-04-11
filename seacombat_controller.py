@@ -6,7 +6,8 @@ import seacombat_logic
 cell_side = 25
 field = None
 field2 = None
-
+root = None
+canvas = None
 
 def create_ship(event):
     seacombat_draw.draw_new_ship(event.x, event.y, 'new_ship')
