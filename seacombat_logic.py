@@ -109,4 +109,3 @@ def get_ship_with_area_around(ship):
 def place_ship(row, column, direction, size, field):
     ship = get_ship(row, column, direction, size)
     field[size].append(ship)
-    # seacombat_draw.show_dict_field(field)

@@ -1,4 +1,3 @@
-import math
 import tkinter
 
 root = None
@@ -13,6 +12,29 @@ field2_left_x = 22 * cell_side
 field1_left_y = field2_left_y = cell_side * 2
 
 
+def change_rectangle_color(tag, color):
+    elem = canvas.find_withtag(tag)[0]
+    canvas.itemconfig(elem, outline=color)
+
+
+def draw_new_ship(event_x, event_y, tag):
+    # if canvas.coords('new_ship'):  # prevent creation of two new ships
+    #     return
+
+    ship = canvas.find_closest(event_x, event_y)
+    ship_coords = canvas.coords(ship)
+    ship_size = (ship_coords[2] - ship_coords[0]) / cell_side
+
+    width = cell_side * ship_size
+    x = event_x - width / 2
+    y = event_y - cell_side / 2
+    return canvas.create_rectangle(x, y,
+                                   x + cell_side * ship_size,
+                                   y + cell_side, width=3, outline=draw_color,
+                                   fill=background_color,
+                                   tags=tag)
+
+
 def create_grid(w, h):
     for i in range(0, w, cell_side):
         canvas.create_line(i, 0, i, h, fill=lines_color)
@@ -22,11 +44,13 @@ def create_grid(w, h):
     canvas.pack(fill=tkinter.BOTH, expand=True)
 
 
+def delete_element(tag):
+    canvas.delete(tag)
+
+
 def draw_list_of_ships():
     size = 4
-    ships = []
     while size > 0:
-
         canvas.create_text(cell_side * 2.5,
                            cell_side * 0.5 + cell_side * (5 - size) * 2,
                            text=5 - size, fill=draw_color, width=3)
@@ -38,25 +62,23 @@ def draw_list_of_ships():
 
         left_x = cell_side * 4
         left_y = 2 * cell_side * (5 - size)
-        ships.append(canvas.create_rectangle(left_x, left_y, left_x + cell_side * size,
+        canvas.create_rectangle(left_x, left_y, left_x + cell_side * size,
                                 left_y + cell_side,
                                 width=3, outline=draw_color,
                                 fill=background_color,
-                                tags='ship'))
-        # lambda event: create_ship(event, size))
-        # canvas.update()
+                                tags='ship')
         size -= 1
-    return ships
+    return 'ship'
 
 
 def draw_field(coord_x, coord_y, field, tag):
-    canvas.create_rectangle(coord_x - 1, coord_y - 1,
-                            coord_x + 1 + cell_side * 10,
-                            coord_y + 1 + cell_side * 10,
+    canvas.create_rectangle(coord_x, coord_y,  # draw field border
+                            coord_x + cell_side * 10,
+                            coord_y + cell_side * 10,
                             width=3, outline=draw_color, tags=tag)
 
     letters = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ж', 'З', 'И', 'К']
-    for ix in range(10):
+    for ix in range(10):  # draw  numbers and letters
         canvas.create_text(coord_x + cell_side * ix + cell_side / 2,
                            coord_y - cell_side / 2, text=letters[ix],
                            fill=draw_color)
@@ -66,7 +88,7 @@ def draw_field(coord_x, coord_y, field, tag):
                            fill=draw_color)
 
     list_of_ships = []
-    for size in field:
+    for size in field:  # draw ships on field
         list_of_ships.extend(field[size])
     for ship in list_of_ships:
         for deck in ship:
@@ -79,10 +101,7 @@ def draw_field(coord_x, coord_y, field, tag):
                                     width=3, outline=draw_color)
 
 
-
-
-
-def init_gui():
+def init_gui(field, field2):
     global root, canvas
     root = tkinter.Tk()
     root.title("SeaCombat")
@@ -101,25 +120,24 @@ def init_gui():
     create_grid(w, h)
     draw_field(field1_left_x, field1_left_y, field, 'player_field')
     draw_field(field2_left_x, field2_left_y, field2, 'ai_field')
-    return canvas
+    return root, canvas
 
 
+def move_rect(tag, x, y):
+    canvas.move(tag, x, y)
 
-def redraw_field(x, y, field3, tag):
-    draw_field(x, y, field3, tag)
+
+def get_rectangle_coords(tag):
+    return canvas.coords(tag)
 
 
-def start(f1, f2):
-    try:
-        global field, field2
-        field = f1
-        field2 = f2
-        init_gui()
-        draw_list_of_ships()
-        # root.focus_set()
-        root.mainloop()
-    except Exception as e:
-        print(e)
+def redraw_field(x, y, field, tag):
+    delete_element(tag)
+    draw_field(x, y, field, tag)
+
+
+def set_rectangle_coords(tag, x, y, x1, y1):
+    canvas.coords(tag, x, y, x1, y1)
 
 
 def show_battlefield(field):
@@ -162,21 +180,3 @@ def show_dict_field(field):
         for deck in ship:
             field2[deck[0]][deck[1]] = len(ship)
     show_battlefield(field2)
-
-
-def create_rectangle(event_x,event_y,tag):
-    if canvas.coords('new_ship'):  # prevent creation of two new ships
-        return
-
-    ship = canvas.find_closest(event_x, event_y)
-    ship_coords = canvas.coords(ship)
-    ship_size = (ship_coords[2] - ship_coords[0]) / cell_side
-
-    width = cell_side * ship_size
-    x = event_x - width / 2
-    y = event_y - cell_side / 2
-    return canvas.create_rectangle(x, y,
-                            x + cell_side * ship_size,
-                            y + cell_side, width=3, outline=draw_color,
-                            fill=background_color,
-                            tags=tag)
