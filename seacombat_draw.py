@@ -17,10 +17,16 @@ def change_rectangle_color(tag, color):
     canvas.itemconfig(elem, outline=color)
 
 
-def draw_new_ship(event_x, event_y, tag):
-    # if canvas.coords('new_ship'):  # prevent creation of two new ships
-    #     return
+def draw_ship(x, y, size, direction, tag):
+    return canvas.create_rectangle(x, y,
+                                   x + cell_side + cell_side * (size-1) * direction,
+                                   y + cell_side + cell_side * (size-1) * (1 - direction),
+                                   width=3, outline=draw_color,
+                                   fill=background_color,
+                                   tags=tag)
 
+
+def draw_new_ship(event_x, event_y, tag):
     ship = canvas.find_closest(event_x, event_y)
     ship_coords = canvas.coords(ship)
     ship_size = (ship_coords[2] - ship_coords[0]) / cell_side
@@ -47,28 +53,6 @@ def create_grid(w, h):
 def delete_element(tag):
     canvas.delete(tag)
 
-
-def draw_list_of_ships():
-    size = 4
-    while size > 0:
-        canvas.create_text(cell_side * 2.5,
-                           cell_side * 0.5 + cell_side * (5 - size) * 2,
-                           text=5 - size, fill=draw_color, width=3)
-        canvas.create_text(cell_side * 3.5,
-                           cell_side * 0.5 + cell_side * (5 - size) * 2,
-                           text='x',
-                           fill=draw_color,
-                           width=3)
-
-        left_x = cell_side * 4
-        left_y = 2 * cell_side * (5 - size)
-        canvas.create_rectangle(left_x, left_y, left_x + cell_side * size,
-                                left_y + cell_side,
-                                width=3, outline=draw_color,
-                                fill=background_color,
-                                tags='ship')
-        size -= 1
-    return 'ship'
 
 
 def draw_field(coord_x, coord_y, field, tag):
@@ -99,6 +83,19 @@ def draw_field(coord_x, coord_y, field, tag):
                                     coord_x + cell_side * c,
                                     coord_y + cell_side * r,
                                     width=3, outline=draw_color)
+
+
+def draw_counter_of_ship(tag, size, quantity):
+    if len(canvas.find_withtag(tag)) > 0:
+        canvas.delete(tag)
+    canvas.create_text(cell_side * 2.5,
+                       cell_side * 0.5 + cell_side * (5 - size) * 2,
+                       text=quantity, fill=draw_color, width=3, tags=tag)
+    canvas.create_text(cell_side * 3.5,
+                       cell_side * 0.5 + cell_side * (5 - size) * 2,
+                       text='x',
+                       fill=draw_color,
+                       width=3, tags=tag)
 
 
 def init_gui(field, field2):

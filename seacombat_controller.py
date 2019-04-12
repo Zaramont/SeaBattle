@@ -9,6 +9,7 @@ field2 = None
 root = None
 canvas = None
 
+
 def create_ship(event):
     seacombat_draw.draw_new_ship(event.x, event.y, 'new_ship')
     root.bind('<Escape>', delete_ship)
@@ -16,6 +17,26 @@ def create_ship(event):
     canvas.tag_bind('new_ship', '<Button-3>', rotate_ship)
     # canvas.tag_bind('new_ship', '<Motion>', move_ship_by_mouse)
     canvas.bind('<Motion>', move_ship_by_mouse)
+
+
+def draw_list_of_ships(field):
+    size = 4
+    while size > 0:
+        ship_tag = 'ship' + str(size)
+        quantity = 5 - size - len(field[size])
+        seacombat_draw.draw_counter_of_ship('ship_counter_' + str(size), size, quantity)
+
+        left_x = cell_side * 4
+        left_y = 2 * cell_side * (5 - size)
+
+        if len(seacombat_draw.get_rectangle_coords(ship_tag)) <= 0:
+            seacombat_draw.draw_ship(left_x, left_y, size, 1, ship_tag)
+
+        if quantity > 0:
+            canvas.tag_bind(ship_tag, '<Button-1>', create_ship)
+        else:
+            canvas.tag_unbind(ship_tag, '<Button-1>')
+        size -= 1
 
 
 def delete_ship(event):
@@ -91,6 +112,7 @@ def place_ship(event):
         delete_ship(event)
         field_coords = seacombat_draw.get_rectangle_coords('player_field')
         seacombat_draw.redraw_field(field_coords[0], field_coords[1], field, 'player_field')
+        draw_list_of_ships(field)
 
 
 def rotate_ship(event):
@@ -118,8 +140,7 @@ def start(f1, f2):
         field2 = f2
         root, canvas = seacombat_draw.init_gui(field, field2)
 
-        tag = seacombat_draw.draw_list_of_ships()
-        canvas.tag_bind(tag, '<Button-1>', create_ship)
+        draw_list_of_ships(field)
         root.mainloop()
     except Exception as e:
         print(e)
