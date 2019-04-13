@@ -101,14 +101,14 @@ def draw_counter_of_ship(tag, size, quantity):
 def init_gui(field, field2):
     global root, canvas
     root = tkinter.Tk()
-    root.title("SeaCombat")
-
+    root.title('SeaCombat')
+    root.iconbitmap('./resources/SeaCombat.ico')
     w = 34 * cell_side
     h = 14 * cell_side
     mw = root.winfo_screenwidth()
     mh = root.winfo_screenheight()
     root.geometry(
-        "{}x{}+{}+{}".format(w, h, (mw - w) // 2, (mh - h) // 2))
+        '{}x{}+{}+{}'.format(w, h, (mw - w) // 2, (mh - h) // 2))
     root.resizable(0, 0)
 
     canvas = tkinter.Canvas(master=root, background=background_color)
@@ -143,9 +143,9 @@ def show_battlefield(field):
             if field[r][c] == 9:
                 field[r][c] = 'o'
             elif field[r][c] == 0:
-                field[r][c] = "_"
+                field[r][c] = '_'
             else:
-                field[r][c] = "x"
+                field[r][c] = 'x'
     show_array(field)
 
 
