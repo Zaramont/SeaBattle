@@ -163,6 +163,8 @@ def start(f1, f2):
                                    'Reset',
                                    reset_player_field)
         draw_list_of_ships(field)
+        # seacombat_draw.draw_cross(12*cell_side, 5 *cell_side,'red','cross')
+        # seacombat_draw.draw_cross(12*cell_side, 5 *cell_side,'red','cross')
         root.mainloop()
     except Exception as e:
         print(e)

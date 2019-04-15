@@ -22,6 +22,11 @@ def draw_button(x, y, height, width, text, command):
     B.place(x=x, y=y, height=height, width=width)
 
 
+def draw_cross(x,y,color,tag):
+    canvas.create_line(x,y,x+cell_side,y+cell_side,fill=color, width=2)
+    canvas.create_line(x+cell_side,y,x,y+cell_side,fill=color, width=2)
+
+
 def draw_ship(x, y, size, direction, tag):
     return canvas.create_rectangle(x, y,
                                    x + cell_side + cell_side * (
@@ -95,6 +100,7 @@ def draw_field(coord_x, coord_y, field, tag):
                                     coord_x + cell_side * c,
                                     coord_y + cell_side * r,
                                     width=3, outline=draw_color)
+            draw_cross(coord_x + cell_side * (c - 1),coord_y + cell_side * (r - 1),'red','cross')
 
 
 def draw_counter_of_ship(tag, size, quantity):
