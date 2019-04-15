@@ -17,10 +17,17 @@ def change_rectangle_color(tag, color):
     canvas.itemconfig(elem, outline=color)
 
 
+def draw_button(x, y, height, width, text, command):
+    B = tkinter.Button(root, text=text, command=command, bg=background_color)
+    B.place(x=x, y=y, height=height, width=width)
+
+
 def draw_ship(x, y, size, direction, tag):
     return canvas.create_rectangle(x, y,
-                                   x + cell_side + cell_side * (size-1) * direction,
-                                   y + cell_side + cell_side * (size-1) * (1 - direction),
+                                   x + cell_side + cell_side * (
+                                           size - 1) * direction,
+                                   y + cell_side + cell_side * (size - 1) * (
+                                           1 - direction),
                                    width=3, outline=draw_color,
                                    fill=background_color,
                                    tags=tag)
@@ -54,6 +61,11 @@ def delete_element(tag):
     canvas.delete(tag)
 
 
+def delete_elements_inside_rectangle(x1, y1, x2, y2):
+    list_of_elements = canvas.find_enclosed(x1 - 3, y1 - 3, x2 + 3, y2 + 3)
+    for element in list_of_elements:
+        canvas.delete(element)
+
 
 def draw_field(coord_x, coord_y, field, tag):
     canvas.create_rectangle(coord_x, coord_y,  # draw field border
@@ -65,11 +77,11 @@ def draw_field(coord_x, coord_y, field, tag):
     for ix in range(10):  # draw  numbers and letters
         canvas.create_text(coord_x + cell_side * ix + cell_side / 2,
                            coord_y - cell_side / 2, text=letters[ix],
-                           fill=draw_color)
+                           fill=draw_color, tags='coords_' + tag)
         canvas.create_text(coord_x - cell_side / 2,
                            coord_y + cell_side * ix + cell_side / 2,
                            text=ix + 1,
-                           fill=draw_color)
+                           fill=draw_color, tags='coords_' + tag)
 
     list_of_ships = []
     for size in field:  # draw ships on field
@@ -130,6 +142,7 @@ def get_rectangle_coords(tag):
 
 def redraw_field(x, y, field, tag):
     delete_element(tag)
+    delete_element('coords_' + tag)
     draw_field(x, y, field, tag)
 
 

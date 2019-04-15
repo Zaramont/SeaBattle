@@ -24,7 +24,8 @@ def draw_list_of_ships(field):
     while size > 0:
         ship_tag = 'ship' + str(size)
         quantity = 5 - size - len(field[size])
-        seacombat_draw.draw_counter_of_ship('ship_counter_' + str(size), size, quantity)
+        seacombat_draw.draw_counter_of_ship('ship_counter_' + str(size), size,
+                                            quantity)
 
         left_x = cell_side * 4
         left_y = 2 * cell_side * (5 - size)
@@ -111,7 +112,8 @@ def place_ship(event):
             seacombat_logic.get_ship(ship[0], ship[1], ship[2], ship[3]))
         delete_ship(event)
         field_coords = seacombat_draw.get_rectangle_coords('player_field')
-        seacombat_draw.redraw_field(field_coords[0], field_coords[1], field, 'player_field')
+        seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
+                                    'player_field')
         draw_list_of_ships(field)
 
 
@@ -125,12 +127,29 @@ def rotate_ship(event):
     central_point_x = (right_x - left_x) / 2
     central_point_y = (down_y - top_y) / 2
     seacombat_draw.set_rectangle_coords('new_ship',
-                                        ship_coords[0] + central_point_x - central_point_y,
-                                        ship_coords[1] - central_point_x + central_point_y,
-                                        ship_coords[2] - central_point_x + central_point_y,
-                                        ship_coords[3] + central_point_x - central_point_y)
+                                        ship_coords[
+                                            0] + central_point_x - central_point_y,
+                                        ship_coords[
+                                            1] - central_point_x + central_point_y,
+                                        ship_coords[
+                                            2] - central_point_x + central_point_y,
+                                        ship_coords[
+                                            3] + central_point_x - central_point_y)
 
     indicate_legal_state(event)
+
+
+def reset_player_field():
+    global field
+    field = seacombat_logic.get_blank_field()
+    field_coords = seacombat_draw.get_rectangle_coords('player_field')
+    seacombat_draw.delete_elements_inside_rectangle(field_coords[0] - cell_side,
+                                                    field_coords[1] - cell_side,
+                                                    field_coords[2],
+                                                    field_coords[3])
+    seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
+                                'player_field')
+    draw_list_of_ships(field)
 
 
 def start(f1, f2):
@@ -139,7 +158,10 @@ def start(f1, f2):
         field = f1
         field2 = f2
         root, canvas = seacombat_draw.init_gui(field, field2)
-
+        seacombat_draw.draw_button(cell_side * 2, cell_side * 10, cell_side,
+                                   cell_side * 3,
+                                   'Reset',
+                                   reset_player_field)
         draw_list_of_ships(field)
         root.mainloop()
     except Exception as e:
