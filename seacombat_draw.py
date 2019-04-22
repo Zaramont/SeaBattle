@@ -10,7 +10,9 @@ draw_color = '#3d0084'
 field1_left_x = cell_side * 10
 field2_left_x = 22 * cell_side
 field1_left_y = field2_left_y = cell_side * 2
-#show_enemy_placement = 0
+
+
+# show_enemy_placement = 0
 
 
 def change_rectangle_color(tag, color):
@@ -63,17 +65,33 @@ def create_grid(w, h):
     canvas.pack(fill=tkinter.BOTH, expand=True)
 
 
-def create_checkbox_for_enemy_field(x,y,command):
+def create_checkbox_for_enemy_field(x, y, command):
     global show_enemy_placement
     show_enemy_placement = tkinter.IntVar()
-    C  = tkinter.Checkbutton(root, text='Show enemy ships',
-                                  variable=show_enemy_placement, command=command)
+    C = tkinter.Checkbutton(root, text='Show enemy ships',
+                            variable=show_enemy_placement, command=command)
     C.place(x=x, y=y)
     return C
 
 
 def delete_element(tag):
     canvas.delete(tag)
+
+
+def draw_borders(ship, x, y, tag):
+    size = len(ship)
+    if size == 1:
+        direction = 1
+        deck = ship.pop()
+        left_x = x + cell_side * deck[1] - cell_side
+        left_y = y + cell_side * deck[0] - cell_side
+        canvas.create_rectangle(left_x, left_y,
+                                left_x + cell_side + cell_side * (
+                                        size - 1) * direction,
+                                left_y + cell_side + cell_side * (size - 1) * (
+                                        1 - direction),
+                                width=3, outline='red',
+                                tags='borders_' + tag)
 
 
 def draw_dot(x, y, tag):
@@ -107,18 +125,23 @@ def draw_field(coord_x, coord_y, field, tag, show_placement):
         if size != 'misses':
             list_of_ships.extend(field[size])
     for ship in list_of_ships:
+        is_ship_dead = True
         for deck in ship:
             r = deck[0]
             c = deck[1]
             state = deck[2]
+            if deck[2] == 0:
+                is_ship_dead = False
             if show_placement == True:
                 canvas.create_rectangle(coord_x + cell_side * (c - 1),
                                         coord_y + cell_side * (r - 1),
                                         coord_x + cell_side * c,
                                         coord_y + cell_side * r,
-                                        width=3, outline=draw_color, tags='ship_'+tag)
+                                        width=3, outline=draw_color, tags='ship_' + tag)
             if state == 1:
                 draw_cross(coord_x + cell_side * (c - 1), coord_y + cell_side * (r - 1), 'red', 'cross')
+        if is_ship_dead == True:
+            draw_borders(ship, coord_x, coord_y, tag)
     for miss in field['misses']:
         r = miss[0]
         c = miss[1]
@@ -159,6 +182,7 @@ def init_gui(field, field2):
     draw_field(field2_left_x, field2_left_y, field2, 'ai_field', False)
     return root, canvas
 
+
 def get_checkbox_state():
     return show_enemy_placement.get()
 
@@ -174,7 +198,7 @@ def get_rectangle_coords(tag):
 def redraw_field(x, y, field, tag, show_placement):
     delete_element(tag)
     delete_element('coords_' + tag)
-    delete_element('ship_'+tag)
+    delete_element('ship_' + tag)
     draw_field(x, y, field, tag, show_placement)
 
 

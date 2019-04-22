@@ -78,20 +78,20 @@ def get_arranged_ships():
 
 
 def get_blank_field():
-    field = {1: [], 2: [], 3: [], 4: [], 'misses':[]}
-    #field = {1: [{(3, 6, 1)}, {(5, 9, 0)}, {(3, 4, 0)}, {(1, 3, 0)}], 2: [{(7, 10, 0), (7, 9, 1)}, {(7, 4, 1), (7, 5, 0)}, {(10, 7, 0), (9, 7, 0)}], 3: [{(1, 9, 1), (3, 9, 0), (2, 9, 0)}, {(10, 4, 0), (10, 3, 0), (10, 2, 0)}], 4: [{(5, 4, 0), (5, 1, 0), (5, 2, 0), (5, 3, 0)}]}
+    field = {1: [], 2: [], 3: [], 4: [], 'misses': set()}
+    # field = {1: [{(3, 6, 1)}, {(5, 9, 0)}, {(3, 4, 0)}, {(1, 3, 0)}], 2: [{(7, 10, 0), (7, 9, 1)}, {(7, 4, 1), (7, 5, 0)}, {(10, 7, 0), (9, 7, 0)}], 3: [{(1, 9, 1), (3, 9, 0), (2, 9, 0)}, {(10, 4, 0), (10, 3, 0), (10, 2, 0)}], 4: [{(5, 4, 0), (5, 1, 0), (5, 2, 0), (5, 3, 0)}]}
     return field
+
 
 def get_test_field():
     field = {
-                1: [{(3, 6, 1)}, {(5, 9, 0)}, {(3, 4, 0)}, {(1, 3, 0)}],
-                2: [{(7, 10, 0), (7, 9, 1)}, {(7, 4, 1), (7, 5, 0)}, {(10, 7, 0), (9, 7, 0)}],
-                3: [{(1, 9, 1), (3, 9, 0), (2, 9, 0)}, {(10, 4, 0), (10, 3, 0), (10, 2, 0)}],
-                4: [{(5, 4, 0), (5, 1, 0), (5, 2, 0), (5, 3, 0)}],
-                'misses':[(1,1),(1,2),(1,4)]
+        1: [{(3, 6, 1)}, {(5, 9, 0)}, {(3, 4, 0)}, {(1, 3, 0)}],
+        2: [{(7, 10, 0), (7, 9, 1)}, {(7, 4, 1), (7, 5, 0)}, {(10, 7, 0), (9, 7, 0)}],
+        3: [{(1, 9, 1), (3, 9, 0), (2, 9, 0)}, {(10, 4, 0), (10, 3, 0), (10, 2, 0)}],
+        4: [{(5, 4, 0), (5, 1, 0), (5, 2, 0), (5, 3, 0)}],
+        'misses': {(1, 1), (1, 2), (1, 4)}
     }
     return field
-
 
 
 def get_ship(row, column, direction, size):
@@ -121,3 +121,25 @@ def get_ship_with_area_around(ship):
 def place_ship(row, column, direction, size, field):
     ship = get_ship(row, column, direction, size)
     field[size].append(ship)
+
+
+def result_of_shooting(row, column, field):
+    target_ship = None
+    list_of_ships = []
+    for size in field:  # draw ships on field
+        if size != 'misses':
+            for ship in field[size]:
+                if (row,column,0) in ship:
+                    ship.discard((row,column,0))
+                    ship.add((row,column,1))
+                    for deck in ship:
+                        if deck[2]==0:
+                            return 'HIT !!!'
+                    return 'KILL !!!'
+                    # print('{} {}'.format(row,column))
+    field['misses'].add((row,column))
+    return 'MISS !!!'
+                # for deck in ship:
+                #     r = deck[0]
+                #     c = deck[1]
+                #     state = deck[2]
