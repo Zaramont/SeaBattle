@@ -113,8 +113,13 @@ def place_ship(event):
         delete_ship(event)
         field_coords = seacombat_draw.get_rectangle_coords('player_field')
         seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
-                                    'player_field')
+                                    'player_field', True)
         draw_list_of_ships(field)
+
+
+def redraw_enemy_field():
+    field_coords = seacombat_draw.get_rectangle_coords('ai_field')
+    seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2, 'ai_field', show_placement=seacombat_draw.get_checkbox_state())
 
 
 def rotate_ship(event):
@@ -148,7 +153,7 @@ def reset_player_field():
                                                     field_coords[2],
                                                     field_coords[3])
     seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
-                                'player_field')
+                                'player_field', True)
     draw_list_of_ships(field)
 
 
@@ -163,6 +168,8 @@ def start(f1, f2):
                                    'Reset',
                                    reset_player_field)
         draw_list_of_ships(field)
+        checkbox = seacombat_draw.create_checkbox_for_enemy_field(2 * cell_side, 12 * cell_side,redraw_enemy_field)
+        # checkbox.bind('<Button-1>',redraw_enemy_field)
         # seacombat_draw.draw_cross(12*cell_side, 5 *cell_side,'red','cross')
         # seacombat_draw.draw_cross(12*cell_side, 5 *cell_side,'red','cross')
         root.mainloop()

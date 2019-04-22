@@ -10,6 +10,7 @@ draw_color = '#3d0084'
 field1_left_x = cell_side * 10
 field2_left_x = 22 * cell_side
 field1_left_y = field2_left_y = cell_side * 2
+#show_enemy_placement = 0
 
 
 def change_rectangle_color(tag, color):
@@ -22,9 +23,9 @@ def draw_button(x, y, height, width, text, command):
     B.place(x=x, y=y, height=height, width=width)
 
 
-def draw_cross(x,y,color,tag):
-    canvas.create_line(x,y,x+cell_side,y+cell_side,fill=color, width=2)
-    canvas.create_line(x+cell_side,y,x,y+cell_side,fill=color, width=2)
+def draw_cross(x, y, color, tag):
+    canvas.create_line(x, y, x + cell_side, y + cell_side, fill=color, width=2)
+    canvas.create_line(x + cell_side, y, x, y + cell_side, fill=color, width=2)
 
 
 def draw_ship(x, y, size, direction, tag):
@@ -62,8 +63,21 @@ def create_grid(w, h):
     canvas.pack(fill=tkinter.BOTH, expand=True)
 
 
+def create_checkbox_for_enemy_field(x,y,command):
+    global show_enemy_placement
+    show_enemy_placement = tkinter.IntVar()
+    C  = tkinter.Checkbutton(root, text='Show enemy ships',
+                                  variable=show_enemy_placement, command=command)
+    C.place(x=x, y=y)
+    return C
+
+
 def delete_element(tag):
     canvas.delete(tag)
+
+
+def draw_dot(x, y, tag):
+    canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill='red', tags=tag)
 
 
 def delete_elements_inside_rectangle(x1, y1, x2, y2):
@@ -72,7 +86,7 @@ def delete_elements_inside_rectangle(x1, y1, x2, y2):
         canvas.delete(element)
 
 
-def draw_field(coord_x, coord_y, field, tag):
+def draw_field(coord_x, coord_y, field, tag, show_placement):
     canvas.create_rectangle(coord_x, coord_y,  # draw field border
                             coord_x + cell_side * 10,
                             coord_y + cell_side * 10,
@@ -90,17 +104,25 @@ def draw_field(coord_x, coord_y, field, tag):
 
     list_of_ships = []
     for size in field:  # draw ships on field
-        list_of_ships.extend(field[size])
+        if size != 'misses':
+            list_of_ships.extend(field[size])
     for ship in list_of_ships:
         for deck in ship:
-            c = deck[1]
             r = deck[0]
-            canvas.create_rectangle(coord_x + cell_side * (c - 1),
-                                    coord_y + cell_side * (r - 1),
-                                    coord_x + cell_side * c,
-                                    coord_y + cell_side * r,
-                                    width=3, outline=draw_color)
-            draw_cross(coord_x + cell_side * (c - 1),coord_y + cell_side * (r - 1),'red','cross')
+            c = deck[1]
+            state = deck[2]
+            if show_placement == True:
+                canvas.create_rectangle(coord_x + cell_side * (c - 1),
+                                        coord_y + cell_side * (r - 1),
+                                        coord_x + cell_side * c,
+                                        coord_y + cell_side * r,
+                                        width=3, outline=draw_color, tags='ship_'+tag)
+            if state == 1:
+                draw_cross(coord_x + cell_side * (c - 1), coord_y + cell_side * (r - 1), 'red', 'cross')
+    for miss in field['misses']:
+        r = miss[0]
+        c = miss[1]
+        draw_dot(coord_x + cell_side * (c - 0.5), coord_y + cell_side * (r - 0.5), tag + '_misses')
 
 
 def draw_counter_of_ship(tag, size, quantity):
@@ -133,9 +155,12 @@ def init_gui(field, field2):
     canvas.pack(fill=tkinter.BOTH, expand=True)
 
     create_grid(w, h)
-    draw_field(field1_left_x, field1_left_y, field, 'player_field')
-    draw_field(field2_left_x, field2_left_y, field2, 'ai_field')
+    draw_field(field1_left_x, field1_left_y, field, 'player_field', True)
+    draw_field(field2_left_x, field2_left_y, field2, 'ai_field', False)
     return root, canvas
+
+def get_checkbox_state():
+    return show_enemy_placement.get()
 
 
 def move_rect(tag, x, y):
@@ -146,10 +171,11 @@ def get_rectangle_coords(tag):
     return canvas.coords(tag)
 
 
-def redraw_field(x, y, field, tag):
+def redraw_field(x, y, field, tag, show_placement):
     delete_element(tag)
     delete_element('coords_' + tag)
-    draw_field(x, y, field, tag)
+    delete_element('ship_'+tag)
+    draw_field(x, y, field, tag, show_placement)
 
 
 def set_rectangle_coords(tag, x, y, x1, y1):
