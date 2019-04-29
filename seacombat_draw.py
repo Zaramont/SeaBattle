@@ -78,20 +78,15 @@ def delete_element(tag):
     canvas.delete(tag)
 
 
-def draw_borders(ship, x, y, tag):
-    size = len(ship)
-    if size == 1:
-        direction = 1
-        deck = ship.pop()
-        left_x = x + cell_side * deck[1] - cell_side
-        left_y = y + cell_side * deck[0] - cell_side
-        canvas.create_rectangle(left_x, left_y,
-                                left_x + cell_side + cell_side * (
-                                        size - 1) * direction,
-                                left_y + cell_side + cell_side * (size - 1) * (
-                                        1 - direction),
-                                width=3, outline='red',
-                                tags='borders_' + tag)
+def draw_borders(ship, coord_x, coord_y, tag):
+    for deck in ship:
+        r = deck[0]
+        c = deck[1]
+        canvas.create_rectangle(coord_x + cell_side * (c - 1),
+                                coord_y + cell_side * (r - 1),
+                                coord_x + cell_side * c,
+                                coord_y + cell_side * r,
+                                width=3, outline='red', tags='ship_' + tag)
 
 
 def draw_dot(x, y, tag):

@@ -81,11 +81,14 @@ def get_ship_tuple_by_coords(event):
 
 def shot_at_field(event):
     target_cell = find_array_indexes(event.x, event.y, 'ai_field')
-    if target_cell[0] > 10 or target_cell[1] > 10:
+    if target_cell[0] > 10 or target_cell[1] > 10 or target_cell[0] < 0 or \
+            target_cell[1] < 0:
         return
-    result = seacombat_logic.result_of_shooting(target_cell[0], target_cell[1], field2)
+    result = seacombat_logic.result_of_shooting(target_cell[0], target_cell[1],
+                                                field2)
     field_coords = seacombat_draw.get_rectangle_coords('ai_field')
-    seacombat_draw.redraw_field(field_coords[0],field_coords[1],field2,'ai_field',seacombat_draw.get_checkbox_state())
+    seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2,
+                                'ai_field', seacombat_draw.get_checkbox_state())
     print(result)
 
 
@@ -103,6 +106,9 @@ def move_ship_by_mouse(event):
     ship_y = (ship[3] - ship[1]) / 2
     seacombat_draw.move_rect('new_ship', event.x - ship[0] - ship_x,
                              event.y - ship[1] - ship_y)
+
+
+# def is_click_inside_field():
 
 
 def is_placement_legal(event):
@@ -129,7 +135,8 @@ def place_ship(event):
 
 def redraw_enemy_field():
     field_coords = seacombat_draw.get_rectangle_coords('ai_field')
-    seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2, 'ai_field',
+    seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2,
+                                'ai_field',
                                 show_placement=seacombat_draw.get_checkbox_state())
 
 
@@ -179,8 +186,10 @@ def start(f1, f2):
                                    'Reset',
                                    reset_player_field)
         draw_list_of_ships(field)
-        checkbox = seacombat_draw.create_checkbox_for_enemy_field(2 * cell_side, 12 * cell_side, redraw_enemy_field)
-        canvas.bind( '<Button-1>', shot_at_field)
+        checkbox = seacombat_draw.create_checkbox_for_enemy_field(2 * cell_side,
+                                                                  12 * cell_side,
+                                                                  redraw_enemy_field)
+        canvas.bind('<Button-1>', shot_at_field)
         # checkbox.bind('<Button-1>',redraw_enemy_field)
         # seacombat_draw.draw_cross(12*cell_side, 5 *cell_side,'red','cross')
         # seacombat_draw.draw_cross(12*cell_side, 5 *cell_side,'red','cross')

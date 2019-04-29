@@ -124,22 +124,23 @@ def place_ship(row, column, direction, size, field):
 
 
 def result_of_shooting(row, column, field):
-    target_ship = None
-    list_of_ships = []
+    # target_ship = None
+    # list_of_ships = []
     for size in field:  # draw ships on field
         if size != 'misses':
             for ship in field[size]:
                 if (row,column,0) in ship:
-                    ship.discard((row,column,0))
                     ship.add((row,column,1))
+                    ship.discard((row,column,0))
                     for deck in ship:
                         if deck[2]==0:
                             return 'HIT !!!'
+                    misses = get_ship_with_area_around(ship)
+                    for miss in misses:
+                        if (miss[0],miss[1],0) not in ship and (miss[0],miss[1],1) not in ship and (miss[0]>0 and miss[0]<11) and ((miss[1]>0 and miss[1]<11)):
+                            field['misses'].add((miss[0],miss[1]))
                     return 'KILL !!!'
-                    # print('{} {}'.format(row,column))
+                elif (row,column,1) in ship:
+                    return
     field['misses'].add((row,column))
     return 'MISS !!!'
-                # for deck in ship:
-                #     r = deck[0]
-                #     c = deck[1]
-                #     state = deck[2]
