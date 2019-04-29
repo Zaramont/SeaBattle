@@ -86,8 +86,10 @@ def get_blank_field():
 def get_test_field():
     field = {
         1: [{(3, 6, 1)}, {(5, 9, 0)}, {(3, 4, 0)}, {(1, 3, 0)}],
-        2: [{(7, 10, 0), (7, 9, 1)}, {(7, 4, 1), (7, 5, 0)}, {(10, 7, 0), (9, 7, 0)}],
-        3: [{(1, 9, 1), (3, 9, 0), (2, 9, 0)}, {(10, 4, 0), (10, 3, 0), (10, 2, 0)}],
+        2: [{(7, 10, 0), (7, 9, 1)}, {(7, 4, 1), (7, 5, 0)},
+            {(10, 7, 0), (9, 7, 0)}],
+        3: [{(1, 9, 1), (3, 9, 0), (2, 9, 0)},
+            {(10, 4, 0), (10, 3, 0), (10, 2, 0)}],
         4: [{(5, 4, 0), (5, 1, 0), (5, 2, 0), (5, 3, 0)}],
         'misses': {(1, 1), (1, 2), (1, 4)}
     }
@@ -118,6 +120,29 @@ def get_ship_with_area_around(ship):
     return surrounded_ship
 
 
+def reset_field(field):
+    new_field = get_blank_field()
+    for i in range(1, 5):
+        for ship in field[i]:
+            new_ship = set()
+            for deck in ship:
+                new_ship.add((deck[0], deck[1], 0))
+            new_field[i].append(new_ship)
+    return new_field
+
+
+def are_all_ships_dead(field):
+    list_of_ships = []
+    for size in field:  # draw ships on field
+        if size != 'misses':
+            list_of_ships.extend(field[size])
+    for ship in list_of_ships:
+        for deck in ship:
+            if deck[2] == 0:
+                return False
+    return True
+
+
 def place_ship(row, column, direction, size, field):
     ship = get_ship(row, column, direction, size)
     field[size].append(ship)
@@ -129,18 +154,21 @@ def result_of_shooting(row, column, field):
     for size in field:  # draw ships on field
         if size != 'misses':
             for ship in field[size]:
-                if (row,column,0) in ship:
-                    ship.add((row,column,1))
-                    ship.discard((row,column,0))
+                if (row, column, 0) in ship:
+                    ship.add((row, column, 1))
+                    ship.discard((row, column, 0))
                     for deck in ship:
-                        if deck[2]==0:
+                        if deck[2] == 0:
                             return 'HIT !!!'
                     misses = get_ship_with_area_around(ship)
                     for miss in misses:
-                        if (miss[0],miss[1],0) not in ship and (miss[0],miss[1],1) not in ship and (miss[0]>0 and miss[0]<11) and ((miss[1]>0 and miss[1]<11)):
-                            field['misses'].add((miss[0],miss[1]))
+                        if (miss[0], miss[1], 0) not in ship and (
+                        miss[0], miss[1], 1) not in ship and (
+                                miss[0] > 0 and miss[0] < 11) and (
+                        (miss[1] > 0 and miss[1] < 11)):
+                            field['misses'].add((miss[0], miss[1]))
                     return 'KILL !!!'
-                elif (row,column,1) in ship:
+                elif (row, column, 1) in ship:
                     return
-    field['misses'].add((row,column))
+    field['misses'].add((row, column))
     return 'MISS !!!'

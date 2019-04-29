@@ -65,6 +65,16 @@ def create_grid(w, h):
     canvas.pack(fill=tkinter.BOTH, expand=True)
 
 
+def create_menu():
+    menu = tkinter.Menu(root,relief=tkinter.GROOVE)
+    menu.add_command(label='New Game')
+    menu.add_command(label='Save Game')
+    menu.add_command(label='Load Game')
+
+    menu.add_command(label='Exit', command=root.quit)
+    root.config(menu=menu)
+
+
 def create_checkbox_for_enemy_field(x, y, command):
     global show_enemy_placement
     show_enemy_placement = tkinter.IntVar()
@@ -89,8 +99,8 @@ def draw_borders(ship, coord_x, coord_y, tag):
                                 width=3, outline='red', tags='ship_' + tag)
 
 
-def draw_dot(x, y, tag):
-    canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill='red', tags=tag)
+def draw_dot(x, y, color, tag):
+    canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill=color, tags=tag)
 
 
 def delete_elements_inside_rectangle(x1, y1, x2, y2):
@@ -140,7 +150,7 @@ def draw_field(coord_x, coord_y, field, tag, show_placement):
     for miss in field['misses']:
         r = miss[0]
         c = miss[1]
-        draw_dot(coord_x + cell_side * (c - 0.5), coord_y + cell_side * (r - 0.5), tag + '_misses')
+        draw_dot(coord_x + cell_side * (c - 0.5), coord_y + cell_side * (r - 0.5), 'red', tag + '_misses')
 
 
 def draw_counter_of_ship(tag, size, quantity):

@@ -72,24 +72,29 @@ def get_ship_tuple_by_coords(event):
 
     if direction == 1:
         indexes = find_array_indexes(left_x + cell_side / 2,
-                                     event.y, 'player_ship')
+                                     event.y, 'player_field')
     else:
         indexes = find_array_indexes(event.x,
-                                     top_y + cell_side / 2, 'player_ship')
+                                     top_y + cell_side / 2, 'player_field')
     return indexes[0], indexes[1], direction, ship_size
 
 
 def shot_at_field(event):
     target_cell = find_array_indexes(event.x, event.y, 'ai_field')
-    if target_cell[0] > 10 or target_cell[1] > 10 or target_cell[0] < 0 or \
-            target_cell[1] < 0:
+    if target_cell[0] > 10 or target_cell[1] > 10 or target_cell[0] <= 0 or \
+            target_cell[1] <= 0:
         return
     result = seacombat_logic.result_of_shooting(target_cell[0], target_cell[1],
                                                 field2)
     field_coords = seacombat_draw.get_rectangle_coords('ai_field')
     seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2,
                                 'ai_field', seacombat_draw.get_checkbox_state())
-    print(result)
+    if seacombat_logic.are_all_ships_dead(field2):
+        canvas.unbind('<Button-1>')
+        canvas.create_text(25 * cell_side,
+                           cell_side / 2, text="All ships are dead",
+                           fill='red')
+    # print(result)
 
 
 def indicate_legal_state(event):
@@ -106,9 +111,6 @@ def move_ship_by_mouse(event):
     ship_y = (ship[3] - ship[1]) / 2
     seacombat_draw.move_rect('new_ship', event.x - ship[0] - ship_x,
                              event.y - ship[1] - ship_y)
-
-
-# def is_click_inside_field():
 
 
 def is_placement_legal(event):
@@ -173,7 +175,21 @@ def reset_player_field():
     seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
                                 'player_field', True)
     draw_list_of_ships(field)
+    reset_ai_field()
 
+
+def reset_ai_field():
+    global field2
+    field2 = seacombat_logic.reset_field(field2)
+    field_coords = seacombat_draw.get_rectangle_coords('ai_field')
+    seacombat_draw.delete_elements_inside_rectangle(field_coords[0] - cell_side,
+                                                    field_coords[1] - cell_side,
+                                                    field_coords[2],
+                                                    field_coords[3])
+    seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2,
+                                'ai_field', True)
+    checkbox.invoke()
+    checkbox.invoke()
 
 def start(f1, f2):
     try:
@@ -186,6 +202,8 @@ def start(f1, f2):
                                    'Reset',
                                    reset_player_field)
         draw_list_of_ships(field)
+        seacombat_draw.create_menu()
+        global checkbox
         checkbox = seacombat_draw.create_checkbox_for_enemy_field(2 * cell_side,
                                                                   12 * cell_side,
                                                                   redraw_enemy_field)
