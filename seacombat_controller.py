@@ -208,9 +208,6 @@ def start(f1, f2):
                                                                   12 * cell_side,
                                                                   redraw_enemy_field)
         canvas.bind('<Button-1>', shot_at_field)
-        # checkbox.bind('<Button-1>',redraw_enemy_field)
-        # seacombat_draw.draw_cross(12*cell_side, 5 *cell_side,'red','cross')
-        # seacombat_draw.draw_cross(12*cell_side, 5 *cell_side,'red','cross')
         root.mainloop()
     except Exception as e:
         print(e)

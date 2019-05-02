@@ -12,9 +12,6 @@ field2_left_x = 22 * cell_side
 field1_left_y = field2_left_y = cell_side * 2
 
 
-# show_enemy_placement = 0
-
-
 def change_rectangle_color(tag, color):
     elem = canvas.find_withtag(tag)[0]
     canvas.itemconfig(elem, outline=color)
@@ -66,7 +63,7 @@ def create_grid(w, h):
 
 
 def create_menu():
-    menu = tkinter.Menu(root,relief=tkinter.GROOVE)
+    menu = tkinter.Menu(root, relief=tkinter.GROOVE)
     menu.add_command(label='New Game')
     menu.add_command(label='Save Game')
     menu.add_command(label='Load Game')

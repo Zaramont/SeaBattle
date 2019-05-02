@@ -1,5 +1,5 @@
 import random
-
+import json
 
 def are_ships_crossed(ship1, ship2):
     ship1_set = get_ship_with_area_around(ship1)
@@ -172,3 +172,60 @@ def result_of_shooting(row, column, field):
                     return
     field['misses'].add((row, column))
     return 'MISS !!!'
+
+def convert_field_to_object_for_json(field):
+    new_field = dict()
+    new_field['misses'] = list()
+
+    for key in range(1, 5):
+        new_field[key] = list()
+        ships = new_field[key]
+
+        for ship in field[key]:
+            new_ship = dict()
+            new_ship['ship'] = list()
+            for deck in ship:
+                new_deck = dict()
+                new_deck['row'] = deck[0]
+                new_deck['column'] = deck[1]
+                new_deck['state'] = deck[2]
+                new_ship['ship'].append(new_deck)
+            ships.append(new_ship)
+    for miss in field['misses']:
+        new_miss = dict()
+        new_miss['row'] = miss[0]
+        new_miss['column'] = miss[1]
+        new_field['misses'].append(new_miss)
+    return new_field
+
+
+def convert_json_to_field(object):
+    field = seacombat_logic.get_blank_field()
+    for key in range(1, 5):
+        ships = object[str(key)]
+        for ship in ships:
+            new_ship = set()
+            for deck in ship['ship']:
+                new_ship.add((deck['row'], deck['column'], deck['state']))
+            field[key].append(new_ship)
+    for miss in object['misses']:
+        field['misses'].add((miss['row'], miss['column']))
+    return field
+
+def save_to_file(path, field, field2):
+    obj = dict()
+    obj['player_field'] = convert_field_to_object_for_json(field)
+    obj['ai_field'] = convert_field_to_object_for_json(field2)
+
+    encoded_struct = json.dumps(obj)
+    f = open(path, 'w+')
+    f.writelines(encoded_struct)
+    f.close()
+
+
+def load_from_file(path):
+    f = open(path, 'r')
+    decoded_struct = json.load(f)
+    field = convert_json_to_field(decoded_struct['player_field'])
+    field2 = convert_json_to_field(decoded_struct['ai_field'])
+    return field, field2
