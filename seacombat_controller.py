@@ -8,6 +8,7 @@ field = None
 field2 = None
 root = None
 canvas = None
+path_to_save_file = './resources/save_test.json'
 
 
 def create_ship(event):
@@ -79,10 +80,28 @@ def get_ship_tuple_by_coords(event):
     return indexes[0], indexes[1], direction, ship_size
 
 
+def save_game_state():
+    seacombat_logic.save_to_file(path_to_save_file, field, field2)
+    print('Game saved.')
+
+
+def load_game_state():
+    global field, field2
+    fields = seacombat_logic.load_from_file(path_to_save_file)
+    field = fields[0]
+    field2 = fields[1]
+    redraw_player_field()
+    redraw_enemy_field()
+    draw_list_of_ships(field)
+    print('Game loaded.')
+
+
 def shot_at_field(event):
     target_cell = find_array_indexes(event.x, event.y, 'ai_field')
     if target_cell[0] > 10 or target_cell[1] > 10 or target_cell[0] <= 0 or \
             target_cell[1] <= 0:
+        return
+    if len(seacombat_draw.get_rectangle_coords('new_ship')) != 0:
         return
     result = seacombat_logic.result_of_shooting(target_cell[0], target_cell[1],
                                                 field2)
@@ -93,7 +112,7 @@ def shot_at_field(event):
         canvas.unbind('<Button-1>')
         canvas.create_text(25 * cell_side,
                            cell_side / 2, text="All ships are dead",
-                           fill='red',tags='message')
+                           fill='red', tags='message')
     # print(result)
 
 
@@ -143,6 +162,14 @@ def redraw_enemy_field():
                                 show_placement=seacombat_draw.get_checkbox_state())
 
 
+def redraw_player_field():
+    field_coords = seacombat_draw.get_rectangle_coords('player_field')
+    seacombat_draw.delete_element('message')
+    seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
+                                'player_field',
+                                show_placement=True)
+
+
 def rotate_ship(event):
     ship_coords = seacombat_draw.get_rectangle_coords('new_ship')
     left_x = ship_coords[0]
@@ -153,14 +180,10 @@ def rotate_ship(event):
     central_point_x = (right_x - left_x) / 2
     central_point_y = (down_y - top_y) / 2
     seacombat_draw.set_rectangle_coords('new_ship',
-                                        ship_coords[
-                                            0] + central_point_x - central_point_y,
-                                        ship_coords[
-                                            1] - central_point_x + central_point_y,
-                                        ship_coords[
-                                            2] - central_point_x + central_point_y,
-                                        ship_coords[
-                                            3] + central_point_x - central_point_y)
+                                        left_x + central_point_x - central_point_y,
+                                        top_y - central_point_x + central_point_y,
+                                        right_x - central_point_x + central_point_y,
+                                        down_y + central_point_x - central_point_y)
 
     indicate_legal_state(event)
 
@@ -169,10 +192,6 @@ def reset_player_field():
     global field
     field = seacombat_logic.get_blank_field()
     field_coords = seacombat_draw.get_rectangle_coords('player_field')
-    seacombat_draw.delete_elements_inside_rectangle(field_coords[0] - cell_side,
-                                                    field_coords[1] - cell_side,
-                                                    field_coords[2],
-                                                    field_coords[3])
     seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
                                 'player_field', True)
     draw_list_of_ships(field)
@@ -183,14 +202,11 @@ def reset_ai_field():
     global field2
     field2 = seacombat_logic.reset_field(field2)
     field_coords = seacombat_draw.get_rectangle_coords('ai_field')
-    seacombat_draw.delete_elements_inside_rectangle(field_coords[0] - cell_side,
-                                                    field_coords[1] - cell_side,
-                                                    field_coords[2],
-                                                    field_coords[3])
     seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2,
                                 'ai_field', True)
     checkbox.invoke()
     checkbox.invoke()
+
 
 def start(f1, f2):
     try:
@@ -203,12 +219,12 @@ def start(f1, f2):
                                    'Reset',
                                    reset_player_field)
         draw_list_of_ships(field)
-        seacombat_draw.create_menu()
+        seacombat_draw.create_menu(save_game_state, load_game_state)
         global checkbox
         checkbox = seacombat_draw.create_checkbox_for_enemy_field(2 * cell_side,
                                                                   12 * cell_side,
                                                                   redraw_enemy_field)
-        canvas.bind('<Button-1>', shot_at_field)
+        canvas.tag_bind('field2','<Button-1>', shot_at_field)
         root.mainloop()
     except Exception as e:
         print(e)

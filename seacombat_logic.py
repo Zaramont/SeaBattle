@@ -200,7 +200,7 @@ def convert_field_to_object_for_json(field):
 
 
 def convert_json_to_field(object):
-    field = seacombat_logic.get_blank_field()
+    field = get_blank_field()
     for key in range(1, 5):
         ships = object[str(key)]
         for ship in ships:
