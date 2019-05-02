@@ -63,7 +63,7 @@ def create_grid(w, h):
 
 
 def create_menu():
-    menu = tkinter.Menu(root, relief=tkinter.GROOVE)
+    menu = tkinter.Menu(root, relief=tkinter.RAISED)
     menu.add_command(label='New Game')
     menu.add_command(label='Save Game')
     menu.add_command(label='Load Game')

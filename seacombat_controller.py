@@ -93,7 +93,7 @@ def shot_at_field(event):
         canvas.unbind('<Button-1>')
         canvas.create_text(25 * cell_side,
                            cell_side / 2, text="All ships are dead",
-                           fill='red')
+                           fill='red',tags='message')
     # print(result)
 
 
@@ -137,6 +137,7 @@ def place_ship(event):
 
 def redraw_enemy_field():
     field_coords = seacombat_draw.get_rectangle_coords('ai_field')
+    seacombat_draw.delete_element('message')
     seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2,
                                 'ai_field',
                                 show_placement=seacombat_draw.get_checkbox_state())
