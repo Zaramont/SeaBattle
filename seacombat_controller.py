@@ -93,23 +93,43 @@ def load_game_state():
     redraw_player_field()
     redraw_enemy_field()
     draw_list_of_ships(field)
+    if seacombat_logic.is_ships_placement_legal(
+            field) and seacombat_logic.are_all_ships_dead(field) == False:
+        canvas.tag_bind('player_field', '<Button-1>', shot_at_left_field)
+    else:
+        canvas.tag_unbind('player_field', '<Button-1>')
+
+    if seacombat_logic.is_ships_placement_legal(
+            field2) and seacombat_logic.are_all_ships_dead(field2) == False:
+        canvas.tag_bind('ai_field', '<Button-1>', shot_at_right_field)
+    else:
+        canvas.tag_unbind('ai_field', '<Button-1>')
     print('Game loaded.')
 
 
-def shot_at_field(event):
-    target_cell = find_array_indexes(event.x, event.y, 'ai_field')
+def shot_at_left_field(event):
+    shot_at_field(event, field, 'player_field', True)
+
+
+def shot_at_right_field(event):
+    shot_at_field(event, field2, 'ai_field',
+                  seacombat_draw.get_checkbox_state())
+
+
+def shot_at_field(event, field, field_tag, show_placement):
+    target_cell = find_array_indexes(event.x, event.y, field_tag)
     if target_cell[0] > 10 or target_cell[1] > 10 or target_cell[0] <= 0 or \
             target_cell[1] <= 0:
         return
     if len(seacombat_draw.get_rectangle_coords('new_ship')) != 0:
         return
     result = seacombat_logic.result_of_shooting(target_cell[0], target_cell[1],
-                                                field2)
-    field_coords = seacombat_draw.get_rectangle_coords('ai_field')
-    seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2,
-                                'ai_field', seacombat_draw.get_checkbox_state())
-    if seacombat_logic.are_all_ships_dead(field2):
-        canvas.unbind('<Button-1>')
+                                                field)
+    field_coords = seacombat_draw.get_rectangle_coords(field_tag)
+    seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
+                                field_tag, show_placement)
+    if seacombat_logic.are_all_ships_dead(field):
+        canvas.tag_unbind(field_tag, '<Button-1>')
         canvas.create_text(25 * cell_side,
                            cell_side / 2, text="All ships are dead",
                            fill='red', tags='message')
@@ -152,6 +172,10 @@ def place_ship(event):
         seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
                                     'player_field', True)
         draw_list_of_ships(field)
+    if seacombat_logic.is_ships_placement_legal(field):
+        canvas.tag_bind('player_field', '<Button-1>', shot_at_left_field)
+    else:
+        canvas.tag_unbind('player_field', '<Button-1>')
 
 
 def redraw_enemy_field():
@@ -195,7 +219,7 @@ def reset_player_field():
     seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
                                 'player_field', True)
     draw_list_of_ships(field)
-    reset_ai_field()
+    canvas.tag_unbind('player_field', '<Button-1>')
 
 
 def reset_ai_field():
@@ -204,6 +228,7 @@ def reset_ai_field():
     field_coords = seacombat_draw.get_rectangle_coords('ai_field')
     seacombat_draw.redraw_field(field_coords[0], field_coords[1], field2,
                                 'ai_field', True)
+    canvas.tag_bind('ai_field', '<Button-1>', shot_at_right_field)
     checkbox.invoke()
     checkbox.invoke()
 
@@ -216,15 +241,20 @@ def start(f1, f2):
         root, canvas = seacombat_draw.init_gui(field, field2)
         seacombat_draw.draw_button(cell_side * 2, cell_side * 10, cell_side,
                                    cell_side * 3,
-                                   'Reset',
+                                   'Reset L',
                                    reset_player_field)
+        seacombat_draw.draw_button(cell_side * 6, cell_side * 10, cell_side,
+                                   cell_side * 3,
+                                   'Reset R',
+                                   reset_ai_field)
         draw_list_of_ships(field)
         seacombat_draw.create_menu(save_game_state, load_game_state)
         global checkbox
         checkbox = seacombat_draw.create_checkbox_for_enemy_field(2 * cell_side,
                                                                   12 * cell_side,
                                                                   redraw_enemy_field)
-        canvas.tag_bind('field2','<Button-1>', shot_at_field)
+        canvas.tag_bind('player_field', '<Button-1>', shot_at_left_field)
+        canvas.tag_bind('ai_field', '<Button-1>', shot_at_right_field)
         root.mainloop()
     except Exception as e:
         print(e)

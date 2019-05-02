@@ -33,7 +33,7 @@ def can_place_ship(row, column, direction, size, field):
 def is_ships_placement_legal(field):
     list_of_ships = []
 
-    for size in field:
+    for size in range(1,5):
         if len(field[size]) == (5 - size):
             list_of_ships.extend(field[size])
         else:
@@ -48,7 +48,7 @@ def is_ships_placement_legal(field):
 
     quantity = len(list_of_ships)
     for ix in range(quantity - 1):
-        for iy in (ix + 1, quantity):
+        for iy in range(ix + 1, quantity):
             if are_ships_crossed(list_of_ships[ix], list_of_ships[iy]):
                 return False
     return True

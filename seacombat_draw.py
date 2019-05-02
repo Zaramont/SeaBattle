@@ -1,3 +1,4 @@
+import math
 import tkinter
 
 root = None
@@ -26,13 +27,13 @@ def create_checkbox_for_enemy_field(x, y, command):
     return C
 
 
-def create_grid(w, h):
-    for i in range(0, w, cell_side):
-        canvas.create_line(i, 0, i, h, fill=lines_color)
+def create_grid(x, y, w, h, color):
+    for i in range(x + cell_side, w, cell_side):
+        canvas.create_line(i, y, i, h, fill=color)
 
-    for i in range(0, h, cell_side):
-        canvas.create_line(0, i, w, i, fill=lines_color)
-    canvas.pack(fill=tkinter.BOTH, expand=True)
+    for i in range(y+cell_side, h, cell_side):
+        canvas.create_line(x, i, w, i, fill=color)
+    # canvas.pack(fill=tkinter.BOTH, expand=True)
 
 
 def create_menu(func, func2):
@@ -84,11 +85,17 @@ def draw_dot(x, y, color, tag):
 
 
 def draw_field(coord_x, coord_y, field, tag, show_placement):
-    canvas.create_rectangle(coord_x, coord_y,  # draw field border
+    coord_x = math.ceil(coord_x)
+    coord_y = math.ceil(coord_y)
+
+    canvas.create_rectangle(coord_x, coord_y,
                             coord_x + cell_side * 10,
                             coord_y + cell_side * 10,
-                            width=3, outline=draw_color, tags=tag)
-
+                            width=3, fill=background_color, outline=draw_color,
+                            tags=tag)
+    create_grid(coord_x, coord_y,
+                coord_x + cell_side * 10,
+                coord_y + cell_side * 10, lines_color)
     letters = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ж', 'З', 'И', 'К']
     for ix in range(10):  # draw  numbers and letters
         canvas.create_text(coord_x + cell_side * ix + cell_side / 2,
@@ -116,15 +123,18 @@ def draw_field(coord_x, coord_y, field, tag, show_placement):
                                         coord_y + cell_side * (r - 1),
                                         coord_x + cell_side * c,
                                         coord_y + cell_side * r,
-                                        width=3, outline=draw_color, tags='ship_' + tag)
+                                        width=3, outline=draw_color,
+                                        tags='ship_' + tag)
             if state == 1:
-                draw_cross(coord_x + cell_side * (c - 1), coord_y + cell_side * (r - 1), 'red', 'cross')
+                draw_cross(coord_x + cell_side * (c - 1),
+                           coord_y + cell_side * (r - 1), 'red', 'cross')
         if is_ship_dead == True:
             draw_borders(ship, coord_x, coord_y, tag)
     for miss in field['misses']:
         r = miss[0]
         c = miss[1]
-        draw_dot(coord_x + cell_side * (c - 0.5), coord_y + cell_side * (r - 0.5), 'red', tag + '_misses')
+        draw_dot(coord_x + cell_side * (c - 0.5),
+                 coord_y + cell_side * (r - 0.5), 'red', tag + '_misses')
 
 
 def draw_ship(x, y, size, direction, tag):
@@ -178,15 +188,7 @@ def init_gui(field, field2):
 
     canvas = tkinter.Canvas(master=root, background=background_color)
     canvas.pack(fill=tkinter.BOTH, expand=True)
-    canvas.create_rectangle(field1_left_x-0.2*cell_side, field1_left_y-0.2*cell_side,
-                            field1_left_x + cell_side * 10.2,
-                            field1_left_y + cell_side * 10.2,
-                            width=0, outline=draw_color, fill= background_color, tags='field1')
-    canvas.create_rectangle(field2_left_x-0.2*cell_side, field2_left_y-0.2*cell_side,
-                            field2_left_x + cell_side * 10.2,
-                            field2_left_y + cell_side * 10.2,
-                            width=0, outline=draw_color, fill=background_color, tags='field2')
-    create_grid(w, h)
+    create_grid(0, 0, w, h, lines_color)
     draw_field(field1_left_x, field1_left_y, field, 'player_field', True)
     draw_field(field2_left_x, field2_left_y, field2, 'ai_field', False)
     return root, canvas
@@ -206,7 +208,9 @@ def move_rect(tag, x, y):
 
 def redraw_field(x, y, field, tag, show_placement):
     coords = get_rectangle_coords(tag)
-    delete_elements_inside_rectangle(coords[0] - cell_side, coords[1] - cell_side, coords[2], coords[3])
+    delete_elements_inside_rectangle(coords[0] - cell_side,
+                                     coords[1] - cell_side, coords[2],
+                                     coords[3])
     draw_field(x, y, field, tag, show_placement)
 
 
