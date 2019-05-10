@@ -79,7 +79,6 @@ def get_arranged_ships():
 
 def get_blank_field():
     field = {1: [], 2: [], 3: [], 4: [], 'misses': set()}
-    # field = {1: [{(3, 6, 1)}, {(5, 9, 0)}, {(3, 4, 0)}, {(1, 3, 0)}], 2: [{(7, 10, 0), (7, 9, 1)}, {(7, 4, 1), (7, 5, 0)}, {(10, 7, 0), (9, 7, 0)}], 3: [{(1, 9, 1), (3, 9, 0), (2, 9, 0)}, {(10, 4, 0), (10, 3, 0), (10, 2, 0)}], 4: [{(5, 4, 0), (5, 1, 0), (5, 2, 0), (5, 3, 0)}]}
     return field
 
 
@@ -120,7 +119,7 @@ def get_ship_with_area_around(ship):
     return surrounded_ship
 
 
-def reset_field(field):
+def reset_field_state(field):
     new_field = get_blank_field()
     for i in range(1, 5):
         for ship in field[i]:
@@ -149,11 +148,9 @@ def place_ship(row, column, direction, size, field):
 
 
 def result_of_shooting(row, column, field):
-    # target_ship = None
-    # list_of_ships = []
-    for size in field:  # draw ships on field
-        if size != 'misses':
-            for ship in field[size]:
+    for key in field:
+        if key != 'misses':
+            for ship in field[key]:
                 if (row, column, 0) in ship:
                     ship.add((row, column, 1))
                     ship.discard((row, column, 0))

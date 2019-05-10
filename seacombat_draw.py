@@ -33,14 +33,13 @@ def create_grid(x, y, w, h, color):
 
     for i in range(y+cell_side, h, cell_side):
         canvas.create_line(x, i, w, i, fill=color)
-    # canvas.pack(fill=tkinter.BOTH, expand=True)
 
 
-def create_menu(func, func2):
+def create_menu(f_save, f_load):
     menu = tkinter.Menu(root, relief=tkinter.RAISED)
     menu.add_command(label='New Game')
-    menu.add_command(label='Save Game', command=func)
-    menu.add_command(label='Load Game', command=func2)
+    menu.add_command(label='Save Game', command=f_save)
+    menu.add_command(label='Load Game', command=f_load)
 
     menu.add_command(label='Exit', command=root.quit)
     root.config(menu=menu)
@@ -162,6 +161,10 @@ def draw_new_ship(event_x, event_y, tag):
                                    fill=background_color,
                                    tags=tag)
 
+def draw_fields(f1,f2):
+    draw_field(field1_left_x, field1_left_y, f1, 'player_field', True)
+    draw_field(field2_left_x, field2_left_y, f2, 'ai_field', False)
+
 
 def delete_element(tag):
     canvas.delete(tag)
@@ -173,7 +176,7 @@ def delete_elements_inside_rectangle(x1, y1, x2, y2):
         canvas.delete(element)
 
 
-def init_gui(field, field2):
+def init_gui():
     global root, canvas
     root = tkinter.Tk()
     root.title('SeaCombat')
@@ -189,8 +192,6 @@ def init_gui(field, field2):
     canvas = tkinter.Canvas(master=root, background=background_color)
     canvas.pack(fill=tkinter.BOTH, expand=True)
     create_grid(0, 0, w, h, lines_color)
-    draw_field(field1_left_x, field1_left_y, field, 'player_field', True)
-    draw_field(field2_left_x, field2_left_y, field2, 'ai_field', False)
     return root, canvas
 
 
