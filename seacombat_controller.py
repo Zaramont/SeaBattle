@@ -1,4 +1,5 @@
 import math
+import random
 
 import seacombat_draw
 import seacombat_logic
@@ -92,13 +93,13 @@ def load_game_state():
     redraw_player_field()
     redraw_enemy_field()
     draw_list_of_ships(field)
-    if seacombat_logic.is_ships_placement_legal(field) and\
+    if seacombat_logic.is_ships_placement_legal(field) and \
             seacombat_logic.are_all_ships_dead(field) == False:
         canvas.tag_bind('player_field', '<Button-1>', shot_at_left_field)
     else:
         canvas.tag_unbind('player_field', '<Button-1>')
 
-    if seacombat_logic.is_ships_placement_legal(field2) and\
+    if seacombat_logic.is_ships_placement_legal(field2) and \
             seacombat_logic.are_all_ships_dead(field2) == False:
         canvas.tag_bind('ai_field', '<Button-1>', shot_at_right_field)
     else:
@@ -113,6 +114,31 @@ def shot_at_left_field(event):
 def shot_at_right_field(event):
     shot_at_field(event, field2, 'ai_field',
                   seacombat_draw.get_checkbox_state())
+
+
+def get_next_shot():
+    x = random.randint(1, 10)
+    y = random.randint(1, 10)
+    return (x, y)
+
+
+def ai_shot_at_field(field, field_tag):
+    reset_ai_field()
+    shot_count = 0
+    list = []
+    while (seacombat_logic.are_all_ships_dead(field) != True):
+        x, y = get_next_shot()
+        if (x, y) in list:
+            continue
+        list.append((x, y))
+        shot_count += 1
+        seacombat_logic.result_of_shooting(x, y, field)
+        field_coords = seacombat_draw.get_rectangle_coords(field_tag)
+        seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
+                                    field_tag, True)
+        root.update_idletasks()
+        # time.sleep(0.01)
+    print(str(shot_count))
 
 
 def shot_at_field(event, field, field_tag, show_placement):
@@ -134,6 +160,10 @@ def shot_at_field(event, field, field_tag, show_placement):
                            fill='red', tags='message')
 
 
+def ai_shooting(field):
+    pass
+
+
 def indicate_legal_state(event):
     if is_placement_legal(event):
         seacombat_draw.change_rectangle_color('new_ship', 'blue')
@@ -152,7 +182,8 @@ def move_ship_by_mouse(event):
 
 def is_placement_legal(event):
     ship = get_ship_tuple_by_coords(event)
-    if seacombat_logic.can_place_ship(row=ship[0], column=ship[1], direction=ship[2], size=ship[3],
+    if seacombat_logic.can_place_ship(row=ship[0], column=ship[1],
+                                      direction=ship[2], size=ship[3],
                                       field=field):
         return True
     else:
@@ -161,7 +192,8 @@ def is_placement_legal(event):
 
 def place_ship(event):
     ship = get_ship_tuple_by_coords(event)
-    if seacombat_logic.can_place_ship(row=ship[0], column=ship[1], direction=ship[2], size=ship[3],
+    if seacombat_logic.can_place_ship(row=ship[0], column=ship[1],
+                                      direction=ship[2], size=ship[3],
                                       field=field):
         field[ship[3]].append(
             seacombat_logic.get_ship(ship[0], ship[1], ship[2], ship[3]))
@@ -248,14 +280,17 @@ def start(f1, f2):
         seacombat_draw.draw_button(cell_side * 6, cell_side * 10, cell_side,
                                    cell_side * 3,
                                    'Reset R',
-                                   reset_ai_field)
+                                   lambda: reset_ai_field())
         global checkbox
         checkbox = seacombat_draw.create_checkbox_for_enemy_field(2 * cell_side,
                                                                   12 * cell_side,
                                                                   redraw_enemy_field)
         canvas.tag_bind('player_field', '<Button-1>', shot_at_left_field)
         canvas.tag_bind('ai_field', '<Button-1>', shot_at_right_field)
-
+        seacombat_draw.draw_button(cell_side * 26, cell_side * 12, cell_side,
+                                   cell_side * 3,
+                                   'AI_Shooting',
+                                   lambda: ai_shot_at_field(field2, "ai_field"))
         root.mainloop()
     except Exception as e:
         print(e)

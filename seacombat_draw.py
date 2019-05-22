@@ -61,6 +61,11 @@ def draw_button(x, y, height, width, text, command):
     B.place(x=x, y=y, height=height, width=width)
 
 
+def draw_button2(x, y, height, width, text, command):
+    B = tkinter.Button(root, text=text, command=command, bg=background_color)
+    B.place(x=x, y=y, height=height, width=width)
+
+
 def draw_cross(x, y, color, tag):
     canvas.create_line(x, y, x + cell_side, y + cell_side, fill=color, width=2)
     canvas.create_line(x + cell_side, y, x, y + cell_side, fill=color, width=2)

@@ -1,5 +1,6 @@
-import random
 import json
+import random
+
 
 def are_ships_crossed(ship1, ship2):
     ship1_set = get_ship_with_area_around(ship1)
@@ -33,7 +34,7 @@ def can_place_ship(row, column, direction, size, field):
 def is_ships_placement_legal(field):
     list_of_ships = []
 
-    for size in range(1,5):
+    for size in range(1, 5):
         if len(field[size]) == (5 - size):
             list_of_ships.extend(field[size])
         else:
@@ -160,15 +161,16 @@ def result_of_shooting(row, column, field):
                     misses = get_ship_with_area_around(ship)
                     for miss in misses:
                         if (miss[0], miss[1], 0) not in ship and (
-                        miss[0], miss[1], 1) not in ship and (
+                                miss[0], miss[1], 1) not in ship and (
                                 miss[0] > 0 and miss[0] < 11) and (
-                        (miss[1] > 0 and miss[1] < 11)):
+                                (miss[1] > 0 and miss[1] < 11)):
                             field['misses'].add((miss[0], miss[1]))
                     return 'KILL !!!'
                 elif (row, column, 1) in ship:
                     return
     field['misses'].add((row, column))
     return 'MISS !!!'
+
 
 def convert_field_to_object_for_json(field):
     new_field = dict()
@@ -208,6 +210,7 @@ def convert_json_to_field(object):
     for miss in object['misses']:
         field['misses'].add((miss['row'], miss['column']))
     return field
+
 
 def save_to_file(path, field, field2):
     obj = dict()
