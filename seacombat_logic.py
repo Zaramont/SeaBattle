@@ -148,6 +148,12 @@ def place_ship(row, column, direction, size, field):
     field[size].append(ship)
 
 
+def get_next_shot():
+    x = random.randint(1, 10)
+    y = random.randint(1, 10)
+    return (x, y)
+
+
 def result_of_shooting(row, column, field):
     for key in field:
         if key != 'misses':
@@ -157,7 +163,7 @@ def result_of_shooting(row, column, field):
                     ship.discard((row, column, 0))
                     for deck in ship:
                         if deck[2] == 0:
-                            return 'HIT !!!'
+                            return 'HIT'
                     misses = get_ship_with_area_around(ship)
                     for miss in misses:
                         if (miss[0], miss[1], 0) not in ship and (
@@ -165,11 +171,11 @@ def result_of_shooting(row, column, field):
                                 miss[0] > 0 and miss[0] < 11) and (
                                 (miss[1] > 0 and miss[1] < 11)):
                             field['misses'].add((miss[0], miss[1]))
-                    return 'KILL !!!'
+                    return 'KILL'
                 elif (row, column, 1) in ship:
                     return
     field['misses'].add((row, column))
-    return 'MISS !!!'
+    return 'MISS'
 
 
 def convert_field_to_object_for_json(field):

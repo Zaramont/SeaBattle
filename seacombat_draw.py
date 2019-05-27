@@ -187,7 +187,7 @@ def init_gui():
     root.title('SeaCombat')
     root.iconbitmap('./resources/SeaCombat.ico')
     w = 34 * cell_side
-    h = 14 * cell_side
+    h = 15 * cell_side
     mw = root.winfo_screenwidth()
     mh = root.winfo_screenheight()
     root.geometry(

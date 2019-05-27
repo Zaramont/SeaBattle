@@ -116,18 +116,13 @@ def shot_at_right_field(event):
                   seacombat_draw.get_checkbox_state())
 
 
-def get_next_shot():
-    x = random.randint(1, 10)
-    y = random.randint(1, 10)
-    return (x, y)
-
 
 def ai_shot_at_field(field, field_tag):
     reset_ai_field()
     shot_count = 0
     list = []
     while (seacombat_logic.are_all_ships_dead(field) != True):
-        x, y = get_next_shot()
+        x, y = seacombat_logic.get_next_shot()
         if (x, y) in list:
             continue
         list.append((x, y))
