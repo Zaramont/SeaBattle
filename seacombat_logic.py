@@ -115,7 +115,8 @@ def get_ship_with_area_around(ship):
         temp_set = set()
         for r in range(deck[0] - 1, deck[0] + 2):
             for c in range(deck[1] - 1, deck[1] + 2):
-                temp_set.add((r, c, 0))
+                if r > 0 and r < 11 and c > 0 and c < 11:
+                    temp_set.add((r, c, 0))
         surrounded_ship = surrounded_ship | temp_set
     return surrounded_ship
 
@@ -148,7 +149,7 @@ def place_ship(row, column, direction, size, field):
     field[size].append(ship)
 
 
-def get_next_shot():
+def get_random_shot():
     x = random.randint(1, 10)
     y = random.randint(1, 10)
     return (x, y)

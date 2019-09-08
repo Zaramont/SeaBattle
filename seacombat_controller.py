@@ -122,7 +122,7 @@ def ai_shot_at_field(field, field_tag):
     shot_count = 0
     list = []
     while (seacombat_logic.are_all_ships_dead(field) != True):
-        x, y = seacombat_logic.get_next_shot()
+        x, y = seacombat_logic.get_random_shot()
         if (x, y) in list:
             continue
         list.append((x, y))
@@ -264,6 +264,7 @@ def start(f1, f2):
         field2 = f2
 
         root, canvas = seacombat_draw.init_gui()
+        # canvas.field = field
         seacombat_draw.draw_fields(field, field2)
         draw_list_of_ships(field)
         seacombat_draw.create_menu(save_game_state, load_game_state)
