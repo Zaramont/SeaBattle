@@ -155,8 +155,117 @@ def shot_at_field(event, field, field_tag, show_placement):
                            fill='red', tags='message')
 
 
-def ai_shooting(field):
-    pass
+def good_ai_shooting_at_field(field, field_tag):
+    def get_three_two_deck_shots():
+        shots_set = set()
+        coords = [(1, 1), (5, 1), (9, 1), (1, 5), (1, 9)]
+        for r, c in coords:
+
+            while c < 11 and r < 11:
+                shots_set.add((r, c))
+                r += 1
+                c += 1
+        return shots_set
+
+    def get_four_deck_shots():
+        shots_set = set()
+        coords = [(3, 1), (7, 1), (1, 3), (1, 7)]
+        for r, c in coords:
+
+            while c < 11 and r < 11:
+                shots_set.add((r, c))
+                r += 1
+                c += 1
+        return shots_set
+
+    # field = seacombat_logic.reset_field_state(field)
+    shot_count = 0
+    last_shot = None
+    last_result = None
+    value_shots = []
+    previous_shots_set = set()
+    wounded_ship = []
+    killing_mode = False
+
+    ships = {1: 4, 2: 3, 3: 2, 4: 1}
+    shots_set = get_four_deck_shots()
+
+    while (seacombat_logic.are_all_ships_dead(field) != True):
+        if killing_mode == False:
+            if last_result == 'KILL':
+                sur_arr = seacombat_logic.get_ship_with_area_around(
+                    {(last_shot)})
+                for deck in sur_arr:
+                    previous_shots_set.add((deck[0], deck[1]))
+                ships[1] -= 1
+            elif last_result == 'HIT':
+                killing_mode = True
+                wounded_ship.append(last_shot)
+                last_r = last_shot[0]
+                last_c = last_shot[1]
+                coords = ((last_r - 1, last_c), (last_r + 1, last_c),
+                          (last_r, last_c - 1), (last_r, last_c + 1))
+                for r, c in coords:
+                    if r > 10 or c > 10 or r < 1 or c < 1:
+                        continue
+                    if (r, c) not in previous_shots_set:
+                        value_shots.append((r, c))
+
+        elif killing_mode == True:
+            if last_result == 'KILL':
+                wounded_ship.append(last_shot)
+                sur_arr = seacombat_logic.get_ship_with_area_around(
+                    set(wounded_ship))
+                for deck in sur_arr:
+                    previous_shots_set.add((deck[0], deck[1]))
+                if len(wounded_ship) == 4:
+                    shots_set = shots_set.union(get_three_two_deck_shots())
+                ships[len(wounded_ship)] -= 1
+                wounded_ship = []
+                killing_mode = False
+            elif last_result == 'HIT':
+                wounded_ship.append(last_shot)
+                value_shots = []
+                coords = []
+                if wounded_ship[0][0] == wounded_ship[1][0]:
+                    for deck in wounded_ship:
+                        coords.append((deck[0], deck[1] - 1))
+                        coords.append((deck[0], deck[1] + 1))
+                else:
+                    for deck in wounded_ship:
+                        coords.append((deck[0] - 1, deck[1]))
+                        coords.append((deck[0] + 1, deck[1]))
+                for r, c in coords:
+                    if r > 10 or c > 10 or r < 1 or c < 1:
+                        continue
+                    if (r, c) not in previous_shots_set:
+                        value_shots.append((r, c))
+
+        if killing_mode == False:
+            # if ships[2] == 0 and ships[3] == 0 and ships[4] == 0:
+            #     shots_set = set()
+            # else:
+            shots_set = shots_set.difference(previous_shots_set)
+            if len(shots_set) == 0:
+                last_shot = seacombat_logic.get_random_shot()
+                while last_shot in previous_shots_set:
+                    last_shot = seacombat_logic.get_random_shot()
+            else:
+                last_shot = shots_set.pop()
+        else:
+            last_shot = value_shots.pop(
+                random.randint(0, len(value_shots) - 1))
+
+        previous_shots_set.add(last_shot)
+        shot_count += 1
+        last_result = seacombat_logic.result_of_shooting(last_shot[0],
+                                                         last_shot[1], field)
+        field_coords = seacombat_draw.get_rectangle_coords(field_tag)
+        seacombat_draw.redraw_field(field_coords[0], field_coords[1], field,
+                                    field_tag, True)
+        root.update_idletasks()
+    print(str(shot_count))
+
 
 
 def indicate_legal_state(event):
@@ -283,10 +392,14 @@ def start(f1, f2):
                                                                   redraw_enemy_field)
         canvas.tag_bind('player_field', '<Button-1>', shot_at_left_field)
         canvas.tag_bind('ai_field', '<Button-1>', shot_at_right_field)
+        # seacombat_draw.draw_button(cell_side * 26, cell_side * 12, cell_side,
+        #                            cell_side * 3,
+        #                            'AI_Shooting',
+        #                            lambda: ai_shot_at_field(field2, "ai_field"))
         seacombat_draw.draw_button(cell_side * 26, cell_side * 12, cell_side,
                                    cell_side * 3,
                                    'AI_Shooting',
-                                   lambda: ai_shot_at_field(field2, "ai_field"))
+                                   lambda: good_ai_shooting_at_field(field2, "ai_field"))
         root.mainloop()
     except Exception as e:
         print(e)

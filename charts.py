@@ -118,6 +118,8 @@ def alg3(field):
                 coords = ((last_r - 1, last_c), (last_r + 1, last_c),
                           (last_r, last_c - 1), (last_r, last_c + 1))
                 for r, c in coords:
+                    if r > 10 or c > 10 or r < 1 or c < 1:
+                        continue
                     if (r, c) not in previous_shots_set:
                         value_shots.append((r, c))
 
@@ -146,6 +148,8 @@ def alg3(field):
                         coords.append((deck[0] - 1, deck[1]))
                         coords.append((deck[0] + 1, deck[1]))
                 for r, c in coords:
+                    if r > 10 or c > 10 or r < 1 or c < 1:
+                        continue
                     if (r, c) not in previous_shots_set:
                         value_shots.append((r, c))
 
